@@ -242,6 +242,7 @@ for i in times:
     plt.ylabel('FREQUENCY')
     plt.show()
 
+<<<<<<< HEAD
 # Display unique in categorical variables.
 for j in categorical:
     print('-----------',j,'-----------')
@@ -452,3 +453,8 @@ for i in df.columns:
 
 # df.loc[df['DNS_QUERY_TIMES'] == 0, 'DNS_QUERY_TIMES']
 
+=======
+# Display unique states.
+for i in df['WHOIS_STATEPRO'].unique():
+    print(i)
+>>>>>>> 3c952a83ce87ff18ad540a6cd9fa0975bb388182
