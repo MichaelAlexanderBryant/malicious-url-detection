@@ -442,19 +442,3 @@ for i in df['WHOIS_STATEPRO'].unique():
 # Display percent null values per column.    
 for i in df.columns:
     print(i, ':', 100*df[i].isna().sum()/len(df[i]))
-
-# # Zeros exist in content length column, so missing values might not be from
-# # no content. Impute with median or knnimputer.
-# df.loc[df['CONTENT_LENGTH'] == 0, 'CONTENT_LENGTH']    
-# df['CONTENT_LENGTH'].hist()
-
-# # Missing country and state may be missing to hide location. Might be worth
-# # comparing CV scores for imputing and leaving as "none"
-
-# df.loc[df['DNS_QUERY_TIMES'] == 0, 'DNS_QUERY_TIMES']
-
-=======
-# Display unique states.
-for i in df['WHOIS_STATEPRO'].unique():
-    print(i)
->>>>>>> 3c952a83ce87ff18ad540a6cd9fa0975bb388182
