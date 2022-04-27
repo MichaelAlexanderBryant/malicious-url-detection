@@ -443,5 +443,5 @@ for i in df['WHOIS_STATEPRO'].unique():
 for i in df.columns:
     print(i, ':', 100*df[i].isna().sum()/len(df[i]))
     
-    
+# Export cleaned dataframe for imputation.    
 df.to_csv('../output/eda/df_to_impute.csv', index=False)
