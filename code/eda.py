@@ -442,3 +442,6 @@ for i in df['WHOIS_STATEPRO'].unique():
 # Display percent null values per column.    
 for i in df.columns:
     print(i, ':', 100*df[i].isna().sum()/len(df[i]))
+    
+    
+df.to_csv('../output/eda/df_to_impute.csv', index=False)
