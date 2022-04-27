@@ -216,9 +216,6 @@ for i in times:
     plt.ylabel('FREQUENCY')
     plt.show()
 
-# for tomorrow:
-# just cleaned dates, but is there valuable information in errors in the data?
-# below for instance, states that are entered as bc and British Columbia
-# should these be cleaned or are they different due to attacker? same with dates.    
+# Display unique states.
 for i in df['WHOIS_STATEPRO'].unique():
     print(i)
