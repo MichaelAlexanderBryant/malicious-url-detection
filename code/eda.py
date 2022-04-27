@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import re
-from datetime import datetime
 
 # Load dataset.
 df = pd.read_csv('../dataset.csv')
@@ -77,7 +76,7 @@ for idx, val in enumerate(df['WHOIS_REGDATE']):
     except:
         pass
     if val == 'nan':
-        WHOIS_REGDATE_date.append(i)
+        WHOIS_REGDATE_date.append(val)
         m = 1
     if (j+k+m) != 1:
         print(val)
@@ -104,7 +103,7 @@ for idx, val in enumerate(df['WHOIS_UPDATED_DATE']):
     except:
         pass
     if val == 'nan':
-        WHOIS_UPDATED_DATE_date.append(i)
+        WHOIS_UPDATED_DATE_date.append(val)
         m = 1
     if (j+k+m) != 1:
         print(val)
@@ -123,7 +122,7 @@ for idx, val in enumerate(df['WHOIS_REGDATE']):
     except:
         pass
     if val == 'nan':
-        WHOIS_REGDATE_time.append(i)
+        WHOIS_REGDATE_time.append(val)
         m = 1
     if (j+m) != 1:
         print(val)
@@ -142,7 +141,7 @@ for idx, val in enumerate(df['WHOIS_UPDATED_DATE']):
     except:
         pass
     if val == 'nan':
-        WHOIS_UPDATED_DATE_time.append(i)
+        WHOIS_UPDATED_DATE_time.append(val)
         m = 1
     if (j+k+m) != 1:
         print(val)
@@ -153,19 +152,21 @@ len(WHOIS_UPDATED_DATE_time) == len(df)
 
 # Put parsed lists into dataframe and fix nan values.
 df['REGISTER_DATE'] = WHOIS_REGDATE_date
-df.loc[df['REGISTER_DATE']==139, 'REGISTER_DATE'] = np.nan
+df.loc[df['REGISTER_DATE']=='nan', 'REGISTER_DATE'] = np.nan
 df['REGISTER_TIME'] = WHOIS_REGDATE_time
-df.loc[df['REGISTER_TIME']==139, 'REGISTER_TIME'] = np.nan
+df.loc[df['REGISTER_TIME']=='nan', 'REGISTER_TIME'] = np.nan
 df['LAST_UPDATE_DATE'] = WHOIS_UPDATED_DATE_date
-df.loc[df['LAST_UPDATE_DATE']==139, 'LAST_UPDATE_DATE'] = np.nan
+df.loc[df['LAST_UPDATE_DATE']=='nan', 'LAST_UPDATE_DATE'] = np.nan
 df['LAST_UPDATE_TIME'] = WHOIS_UPDATED_DATE_time
-df.loc[df['LAST_UPDATE_TIME']==139, 'LAST_UPDATE_TIME'] = np.nan
+df.loc[df['LAST_UPDATE_TIME']=='nan', 'LAST_UPDATE_TIME'] = np.nan
 
 # Convert date and time columns to datetime.
 for i in ['REGISTER_DATE', 'LAST_UPDATE_DATE']:
     df[i] = pd.to_datetime(df[i], format = "%d/%m/%Y")
 for i in ['REGISTER_TIME', 'LAST_UPDATE_TIME']:
     df[i] = pd.to_datetime(df[i], format = "%H:%M")
+    
+df.info()
 
 # Create seperate columns for month, day, year, hour, and minutes.
 df['REGISTER_MONTH'] = df['REGISTER_DATE'].dt.month
@@ -179,6 +180,22 @@ df['REGISTER_MINUTES'] = df['REGISTER_TIME'].dt.minute
 df['LAST_UPDATED_HOUR'] = df['LAST_UPDATE_TIME'].dt.hour
 df['LAST_UPDATED_MINUTES'] = df['LAST_UPDATE_TIME'].dt.minute
 
+# Create features based on day of year, day of month, day of week, and weekday.
+df['REGISTER_DAYOFYEAR'] = df['REGISTER_DATE'].dt.dayofyear
+df['REGISTER_DAYOFMONTH'] = df['REGISTER_DATE'].dt.days_in_month
+df['REGISTER_DAYOFWEEK'] = df['REGISTER_DATE'].dt.dayofweek
+df['REGISTER_WEEKDAY'] = df['REGISTER_DATE'].dt.weekday
+df['REGISTER_WORKINGDAY'] = (df['REGISTER_DATE'].dt.weekday <= 4).astype(int)
+df['REGISTER_WEEKEND'] = (df['REGISTER_DATE'].dt.weekday >= 5).astype(int)
+df['LAST_UPDATED_DAYOFYEAR'] = df['LAST_UPDATE_DATE'].dt.dayofyear
+df['LAST_UPDATED_DAYOFMONTH'] = df['LAST_UPDATE_DATE'].dt.days_in_month
+df['LAST_UPDATED_DAYOFWEEK'] = df['LAST_UPDATE_DATE'].dt.dayofweek
+df['LAST_UPDATED_WEEKDAY'] = df['LAST_UPDATE_DATE'].dt.weekday
+df['LAST_UPDATED_WORKINGDAY'] = (df['LAST_UPDATE_DATE'].dt.weekday == 4).astype(int)
+df['LAST_UPDATED_WEEKEND'] = (df['LAST_UPDATE_DATE'].dt.weekday >= 5).astype(int)
+
+
+
 # Drop original dates columns.
 for i in ['WHOIS_REGDATE', 'WHOIS_UPDATED_DATE', 'REGISTER_DATE',
           'REGISTER_TIME','LAST_UPDATE_DATE', 'LAST_UPDATE_TIME']:
@@ -187,16 +204,25 @@ for i in ['WHOIS_REGDATE', 'WHOIS_UPDATED_DATE', 'REGISTER_DATE',
 # Display columns names and dtypes    
 df.info()
 
-# Drop extra column.
-df = df.drop(139, axis=1)
-
 # Lists of dates and times
 dates = ['REGISTER_MONTH',
          'REGISTER_DAY',
          'REGISTER_YEAR',
+         'REGISTER_DAYOFYEAR',
+         'REGISTER_DAYOFMONTH',
+         'REGISTER_DAYOFWEEK',
+         'REGISTER_WEEKDAY',
+         'REGISTER_WORKINGDAY',
+         'REGISTER_WEEKEND',
          'LAST_UPDATED_MONTH',
          'LAST_UPDATED_DAY',
-         'LAST_UPDATED_YEAR']
+         'LAST_UPDATED_YEAR',
+         'LAST_UPDATED_DAYOFYEAR',
+         'LAST_UPDATED_DAYOFMONTH',
+         'LAST_UPDATED_DAYOFWEEK',
+         'LAST_UPDATED_WEEKDAY',
+         'LAST_UPDATED_WORKINGDAY',
+         'LAST_UPDATED_WEEKEND',]
 times = ['REGISTER_HOUR',
          'REGISTER_MINUTES',
          'LAST_UPDATED_HOUR',
@@ -216,9 +242,213 @@ for i in times:
     plt.ylabel('FREQUENCY')
     plt.show()
 
-# for tomorrow:
-# just cleaned dates, but is there valuable information in errors in the data?
-# below for instance, states that are entered as bc and British Columbia
-# should these be cleaned or are they different due to attacker? same with dates.    
+# Display unique in categorical variables.
+for j in categorical:
+    print('-----------',j,'-----------')
+    for i in df[j].unique():
+        print(i)
+
+# Set values to upper/lower cases.        
+df['CHARSET'] = df['CHARSET'].str.upper()
+df['SERVER'] = df['SERVER'].str.lower()
+df['WHOIS_COUNTRY'] = df['WHOIS_COUNTRY'].str.upper()
+df['WHOIS_STATEPRO'] = df['WHOIS_STATEPRO'].str.upper()
+
+# Find server names without version numbers and slashes.
+before_first_slash = re.compile(r"([a-zA-Z0-9_]*)[^/]*")
+servers = []
+for idx,val in enumerate(df['SERVER'].unique()):
+    server_split = str(val).split(' ')
+    for i in server_split:
+        item = before_first_slash.search(i.replace('(','').replace(')',''))
+        servers.append(item.group())
+
+# Create a series of unique servers and remove accidental regex identifications.
+unique_servers = pd.Series(servers).unique()
+unique_servers = unique_servers[unique_servers != '']
+unique_servers = unique_servers[unique_servers != 'nan']
+unique_servers = unique_servers[unique_servers != 'none']
+unique_servers = unique_servers[unique_servers != 'web']
+unique_servers = unique_servers[unique_servers != 'server']
+unique_servers = unique_servers[unique_servers != '+']
+unique_servers = unique_servers[unique_servers != '5.0.30']
+unique_servers = unique_servers[unique_servers != '1.12.2']
+unique_servers = unique_servers[unique_servers != '2.6.8;']
+unique_servers = unique_servers[unique_servers != '.v01']
+unique_servers = unique_servers[unique_servers != '&']
+unique_servers = unique_servers[unique_servers != '294']
+unique_servers = unique_servers[unique_servers != '999']
+unique_servers = unique_servers[unique_servers != 'xxxxxxxxxxxxxxxxxxxxxx']
+unique_servers = unique_servers[unique_servers != 'my']
+unique_servers = unique_servers[unique_servers != 'arse']
+
+unique_servers
+
+# Create a binary matrix of the unique servers.
+binary_servers = pd.DataFrame(columns = unique_servers)
+for idx,val in enumerate(df['SERVER']):
+    temp = []
+    for i in unique_servers:
+        if i in str(val):
+            temp.append(1)
+        else:
+            temp.append(0)
+    binary_servers.loc[idx] = temp
+
+# Display top 10 most common servers.
+binary_servers.sum().sort_values(ascending=False)[0:10]
+
+# Concatenate binary servers df with original df and drop original SERVER column
+df = pd.concat([df, binary_servers], axis=1)
+df = df.drop('SERVER', axis=1)
+
+# Remove SERVER from categorical list, add new columns.
+categorical.remove('SERVER')
+categorical = categorical + list(binary_servers.columns)
+
+# Display unique in categorical variables for remaining columns to clean.
+for j in categorical[1:3]:
+    print('-----------',j,'-----------')
+    for i in df[j].unique():
+        print(i)
+
+df.loc[df['WHOIS_COUNTRY'] == 'NONE', 'WHOIS_COUNTRY'] = np.nan      
+df.loc[df['WHOIS_COUNTRY'] == 'CYPRUS', 'WHOIS_COUNTRY'] = 'CY'
+df.loc[df['WHOIS_COUNTRY'] == 'UNITED KINGDOM', 'WHOIS_COUNTRY'] = 'UK'        
+df.loc[df['WHOIS_COUNTRY'] == "[U'GB'; U'UK']", 'WHOIS_COUNTRY'] = 'UK' 
+
+# Display unique values in WHOIS_STATEPRO
 for i in df['WHOIS_STATEPRO'].unique():
     print(i)
+
+# Dictionary for converting US state abbreviations to full name.
+us_state_to_abbrev = {
+    "Alabama": "AL",
+    "Alaska": "AK",
+    "Arizona": "AZ",
+    "Arkansas": "AR",
+    "California": "CA",
+    "Colorado": "CO",
+    "Connecticut": "CT",
+    "Delaware": "DE",
+    "Florida": "FL",
+    "Georgia": "GA",
+    "Hawaii": "HI",
+    "Idaho": "ID",
+    "Illinois": "IL",
+    "Indiana": "IN",
+    "Iowa": "IA",
+    "Kansas": "KS",
+    "Kentucky": "KY",
+    "Louisiana": "LA",
+    "Maine": "ME",
+    "Maryland": "MD",
+    "Massachusetts": "MA",
+    "Michigan": "MI",
+    "Minnesota": "MN",
+    "Mississippi": "MS",
+    "Missouri": "MO",
+    "Montana": "MT",
+    "Nebraska": "NE",
+    "Nevada": "NV",
+    "New Hampshire": "NH",
+    "New Jersey": "NJ",
+    "New Mexico": "NM",
+    "New York": "NY",
+    "North Carolina": "NC",
+    "North Dakota": "ND",
+    "Ohio": "OH",
+    "Oklahoma": "OK",
+    "Oregon": "OR",
+    "Pennsylvania": "PA",
+    "Rhode Island": "RI",
+    "South Carolina": "SC",
+    "South Dakota": "SD",
+    "Tennessee": "TN",
+    "Texas": "TX",
+    "Utah": "UT",
+    "Vermont": "VT",
+    "Virginia": "VA",
+    "Washington": "WA",
+    "West Virginia": "WV",
+    "Wisconsin": "WI",
+    "Wyoming": "WY",
+    "District of Columbia": "DC",
+    "American Samoa": "AS",
+    "Guam": "GU",
+    "Northern Mariana Islands": "MP",
+    "Puerto Rico": "PR",
+    "United States Minor Outlying Islands": "UM",
+    "U.S. Virgin Islands": "VI",
+}
+
+# Replace US State abbreviations with full name.
+for key, value in us_state_to_abbrev.items():
+    df.loc[df['WHOIS_STATEPRO'] == value, 'WHOIS_STATEPRO'] = key
+ 
+# Dictionary for replacing Canadian province abbreviations with full name.
+can_province_abbrev = {
+  'Alberta': 'AB',
+  'British Columbia': 'BC',
+  'Manitoba': 'MB',
+  'New Brunswick': 'NB',
+  'Newfoundland and Labrador': 'NL',
+  'Northwest Territories': 'NT',
+  'Nova Scotia': 'NS',
+  'Nunavut': 'NU',
+  'Ontario': 'ON',
+  'Prince Edward Island': 'PE',
+  'Quebec': 'QC',
+  'Saskatchewan': 'SK',
+  'Yukon': 'YT'
+}
+
+# Replace Canadian province abbreviations with full name.
+for key, value in can_province_abbrev.items():
+    df.loc[df['WHOIS_STATEPRO'] == value, 'WHOIS_STATEPRO'] = key
+
+# Convert state to uppercase.
+df['WHOIS_STATEPRO'] = df['WHOIS_STATEPRO'].str.upper()
+
+# Display unique values in WHOIS_STATEPRO
+for i in df['WHOIS_STATEPRO'].unique():
+    print(i)
+
+# Finish cleaning states by hand.
+df.loc[df['WHOIS_STATEPRO'] == 'NONE', 'WHOIS_STATEPRO'] = np.nan 
+df.loc[df['WHOIS_STATEPRO'] == 'WC1N', 'WHOIS_STATEPRO'] = 'LONDON'
+df.loc[df['WHOIS_STATEPRO'] == 'UK', 'WHOIS_STATEPRO'] = np.nan
+df.loc[df['WHOIS_STATEPRO'] == 'P', 'WHOIS_STATEPRO'] = np.nan
+df.loc[df['WHOIS_STATEPRO'] == 'QLD', 'WHOIS_STATEPRO'] = 'QUEENSLAND'
+df.loc[df['WHOIS_STATEPRO'] == '--', 'WHOIS_STATEPRO'] = np.nan
+df.loc[df['WHOIS_STATEPRO'] == 'NSW', 'WHOIS_STATEPRO'] = 'NEW SOUTH WALES'
+df.loc[df['WHOIS_STATEPRO'] == 'VIC', 'WHOIS_STATEPRO'] = 'VICTORIA'
+df.loc[df['WHOIS_STATEPRO'] == '6110021', 'WHOIS_STATEPRO'] = 'UJI'
+df.loc[df['WHOIS_STATEPRO'] == 'NOT APPLICABLE', 'WHOIS_STATEPRO'] = np.nan
+df.loc[df['WHOIS_STATEPRO'] == 'ILOCOS NORTE R3', 'WHOIS_STATEPRO'] = 'ILOCOS NORTE'
+df.loc[df['WHOIS_STATEPRO'] == 'WIDESTEP@MAIL.RU', 'WHOIS_STATEPRO'] = np.nan
+df.loc[df['WHOIS_STATEPRO'] == 'ZH', 'WHOIS_STATEPRO'] = 'ZURICH'
+df.loc[df['WHOIS_STATEPRO'] == '-', 'WHOIS_STATEPRO'] = np.nan
+df.loc[df['WHOIS_STATEPRO'] == 'CH', 'WHOIS_STATEPRO'] = np.nan
+df.loc[df['WHOIS_STATEPRO'] == 'TOKYO-TO', 'WHOIS_STATEPRO'] = 'TOKYO'
+df.loc[df['WHOIS_STATEPRO'] == 'CO. DUBLIN', 'WHOIS_STATEPRO'] = 'DUBLIN'
+df.loc[df['WHOIS_STATEPRO'] == 'OTHER', 'WHOIS_STATEPRO'] = np.nan
+
+# Display unique values in WHOIS_STATEPRO
+for i in df['WHOIS_STATEPRO'].unique():
+    print(i)
+    
+# Display percent null values per column.    
+for i in df.columns:
+    print(i, ':', 100*df[i].isna().sum()/len(df[i]))
+
+# # Zeros exist in content length column, so missing values might not be from
+# # no content. Impute with median or knnimputer.
+# df.loc[df['CONTENT_LENGTH'] == 0, 'CONTENT_LENGTH']    
+# df['CONTENT_LENGTH'].hist()
+
+# # Missing country and state may be missing to hide location. Might be worth
+# # comparing CV scores for imputing and leaving as "none"
+
+# df.loc[df['DNS_QUERY_TIMES'] == 0, 'DNS_QUERY_TIMES']
+
