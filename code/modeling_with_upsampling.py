@@ -1,10 +1,5 @@
 """
-Modeling with unbalanced classes, here is what I tried:
-    1. Changed prior probabilities for naive Bayes and linear discriminant analysis
-    2. Undersampled with random forest
-    3. Model tuned with scoring set to recall
-    4. Unequal case weights with logistic regression and xgboost
-    5. Cost sensitive training with SVC
+Modeling with upsampling.
     
 Randomly guessing malicious website (type=1) produces a recall of 1, but accuracy
 and precision scores of 0.12128.
@@ -20,6 +15,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.utils import resample
 from sklearn.linear_model import LogisticRegression
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier
@@ -38,22 +34,46 @@ from sklearn import metrics
 # Load split data.
 X_train = pd.read_csv('../output/imputation/X_train.csv')
 y_train = pd.read_csv('../output/imputation/y_train.csv')
-y_train = np.ravel(np.array(y_train))
 X_test = pd.read_csv('../output/imputation/X_test.csv')
 y_test = pd.read_csv('../output/imputation/y_test.csv')
 
-lr = LogisticRegression(max_iter = 2000, class_weight = {0:1,1:1})
+# https://wellsr.com/python/upsampling-and-downsampling-imbalanced-data-in-python/
+train_data = pd.concat([X_train,y_train],axis=1)
+train_data.columns
+
+malicious_websites = train_data[train_data["Type"] == 1]
+benign_websites = train_data[train_data["Type"] == 0]
+print(malicious_websites.shape)
+print(benign_websites.shape)
+
+malicious_upsample = resample(malicious_websites,
+             replace=True,
+             n_samples=len(benign_websites),
+             random_state=1)
+
+print(malicious_upsample.shape)
+malicious_upsample.columns
+
+train_data = pd.concat([malicious_upsample, benign_websites], axis=0)
+train_data.shape
+train_data.columns
+
+X_train = train_data.copy()
+y_train = X_train.pop('Type')
+
+
+lr = LogisticRegression(max_iter = 2000)
 cv = cross_val_score(lr,X_train,y_train,cv=5, scoring='f1')
 print(mean(cv), '+/-', std(cv))
 
 # Class_weight is a form of downsampling to accomodate unbalanced dataset.
-rf = RandomForestClassifier(random_state = 1, class_weight = {0:1,1:5})
+rf = RandomForestClassifier(random_state = 1)
 cv = cross_val_score(rf,X_train,y_train,cv=5, scoring = 'f1')
 print(mean(cv), '+/-', std(cv))
 
 # Class_weight is a form of cost-sensitive training to accomodate unbalanced dataset.
 # https://machinelearningmastery.com/cost-sensitive-svm-for-imbalanced-classification/
-svc = SVC(probability = True, class_weight = {0:1,1:25})
+svc = SVC(probability = True)
 cv = cross_val_score(svc,X_train,y_train,cv=5, scoring='f1')
 print(mean(cv), '+/-', std(cv))
 
@@ -65,11 +85,11 @@ bnb = BernoulliNB()
 cv = cross_val_score(bnb,X_train,y_train,cv=5, scoring = 'f1')
 print(mean(cv), '+/-', std(cv))
 
-lda = LinearDiscriminantAnalysis(priors=[0.6,0.4])
+lda = LinearDiscriminantAnalysis()
 cv = cross_val_score(lda,X_train,y_train,cv=5, scoring = 'f1')
 print(mean(cv), '+/-', std(cv))
 
-xgbc = XGBClassifier(scale_pos_weight=8,use_label_encoder = False, eval_metric='error')
+xgbc = XGBClassifier(use_label_encoder = False, eval_metric='error')
 cv = cross_val_score(xgbc,X_train,y_train,cv=5, scoring = 'f1')
 print(mean(cv), '+/-', std(cv))
 
@@ -82,7 +102,7 @@ def clf_performance(classifier, model_name):
         classifier.cv_results_['std_test_score'][classifier.best_index_])))
     print('Best Parameters: ' + str(classifier.best_params_))
     
-lr = LogisticRegression(class_weight = {0:1,1:1})
+lr = LogisticRegression()
 param_grid = {'max_iter' : [15000],
               'C' : np.arange(.001,.015,.001)
              }
@@ -92,7 +112,7 @@ best_clf_lr = clf_lr.fit(X_train,y_train)
 clf_performance(best_clf_lr,'Logistic Regression')
     
 
-rf = RandomForestClassifier(random_state = 1, class_weight = {0:1,1:5})
+rf = RandomForestClassifier(random_state = 1)
 param_grid =  {
                 'n_estimators': np.arange(8,20,2), 
                 'bootstrap': [True,False], #bagging (T) vs. pasting (F)
@@ -107,7 +127,7 @@ best_clf_rf = clf_rf.fit(X_train,y_train)
 clf_performance(best_clf_rf,'RandomForestClassifier')
 
 
-svc = SVC(probability = True, random_state = 1, class_weight = {0:1,1:25})
+svc = SVC(probability = True, random_state = 1)
 param_grid = {
               'kernel': ['linear', 'poly', 'sigmoid','rbf'],
               'gamma': [1, 1e-1, 1e-2, 1e-3, 1e-4],
@@ -218,7 +238,7 @@ def test_performance(estimators,clf_names,X_test=X_test,y_test=y_test):
         PR_AUC = metrics.auc(recall, precision)
         print('Precision-Recall AUC for {}: {}\n'.format(clf_names[idx], PR_AUC))
         
-        clf_scores = ['No sampling', clf_names[idx], test_recall,
+        clf_scores = ['Upsampling', clf_names[idx], test_recall,
                       test_precision, test_f1, test_accuracy, ROC_AUC, PR_AUC]
         
         if len(df_scores) == 0:
@@ -239,4 +259,4 @@ def test_performance(estimators,clf_names,X_test=X_test,y_test=y_test):
     
 df_scores = test_performance(estimators,names)
 
-df_scores.to_csv('../output/modeling/no_sampling/df_scores.csv', index=False)
+df_scores.to_csv('../output/modeling/upsampling/df_scores.csv', index=False)
