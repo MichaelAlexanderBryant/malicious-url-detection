@@ -34,6 +34,15 @@ categorical = ['CHARSET',
 date = ['WHOIS_REGDATE',
         'WHOIS_UPDATED_DATE']
 
+# Percentage/Counts of malicious/benign websites    
+df['Type'].value_counts()/len(df)
+df['Type'].value_counts()
+
+# Guessing 1:
+# recall=1, precision=accuracy=0.12128, ROC AUC=0.5
+# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7911559/
+# https://pypi.org/project/pyarc/
+
 # Display numerical variable distributions.
 for i in numerical:
     plt.hist(df[i])

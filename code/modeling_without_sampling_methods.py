@@ -1,15 +1,20 @@
-# Guessing 1:
-# recall=1, precision=accuracy=0.12128, ROC AUC=0.5
-# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7911559/
-# https://pypi.org/project/pyarc/
+"""
+Modeling with unbalanced classes, here is what I tried:
+    1. Changed prior probabilities for naive Bayes and linear discriminant analysis
+    2. Undersampled with random forest
+    3. Model tuned with scoring set to recall
+    4. Unequal case weights with logistic regression and xgboost
+    5. Cost sensitive training with SVC
+    
+Randomly guessing malicious website (type=1) produces a recall of 1, but accuracy
+and precision scores of 0.12128.
 
-# I tried changing priors for naive Bayes and linear discriminant analysis,
-# but was ineffective.
-# Next try downsampling or upsampling. SMOTE will probably not be effective here,
-# because it relies on looking at nearest neighbors and this is high dimensional
-# data.
-
-# https://machinelearningmastery.com/roc-curves-and-precision-recall-curves-for-imbalanced-classification/
+Recall is more important than precision, but I also wanted a better balance
+than the result from scoring by recall (which is largely due to the unbalanced
+dataset). I therefore chose F1 as the metric for scoring and chose the best
+model based on test set recall, precision, and accuracy with recall having
+highest priority.
+"""
 
 import numpy as np
 import pandas as pd
@@ -192,8 +197,9 @@ plt.show()
 print('ROC AUC: {}'.format(metrics.auc(fpr, tpr)))
 
 # Plot precision-recall curve.
+# https://machinelearningmastery.com/roc-curves-and-precision-recall-curves-for-imbalanced-classification/
 precision, recall, _ = precision_recall_curve(y_test, pred_prob[:,1])
-plt.plot(recall, precision, marker='.', label='Logistic')
+plt.plot(recall, precision, marker='.', label='XGBClassifier')
 # axis labels
 plt.xlabel('Recall')
 plt.ylabel('Precision')
