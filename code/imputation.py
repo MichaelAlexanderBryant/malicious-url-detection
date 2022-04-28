@@ -17,8 +17,9 @@ df = pd.read_csv('../output/eda/df_to_impute.csv')
 for i in df.columns:
     print(i, ':', 100*df[i].isna().sum()/len(df[i]))
 
-# Percentage of malicious/benign websites    
+# Percentage/Counts of malicious/benign websites    
 df['Type'].value_counts()/len(df)
+df['Type'].value_counts()
 
 # Create X and y variables.
 X = df.copy()
