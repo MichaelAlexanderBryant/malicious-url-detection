@@ -90,6 +90,9 @@ y_pred = lda.predict(X_test)
 print('Test recall: {}'.format(recall_score(y_test, y_pred)))
 print('Test accuracy: {}'.format(accuracy_score(y_test, y_pred)))
 
+# XGBClassifier works well, because scale_pos_weight counteracts the imbalanced
+# dataset. Tried changing priors for naive Bayes and linear discriminant analysis,
+# but was ineffective. Next try sampling methods (e.g., SMOTE, downsampling).
 xgbc = XGBClassifier(eval_metric='error', learning_rate = 0.001, max_depth=4,
                      n_estimators = 100, scale_pos_weight = 7)
 xgbc.fit(X_train, y_train)
