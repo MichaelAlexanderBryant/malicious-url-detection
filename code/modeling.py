@@ -2,11 +2,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-# from sklearn.utils import resample
 from sklearn.linear_model import LogisticRegression
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB, BernoulliNB
+from xgboost import XGBClassifier
 from sklearn.model_selection import cross_val_score
 from numpy import mean, std
 from sklearn.model_selection import GridSearchCV 
@@ -19,31 +20,6 @@ y_train = pd.read_csv('../output/imputation/y_train.csv')
 y_train = np.ravel(np.array(y_train))
 X_test = pd.read_csv('../output/imputation/X_test.csv')
 y_test = pd.read_csv('../output/imputation/y_test.csv')
-
-# # https://wellsr.com/python/upsampling-and-downsampling-imbalanced-data-in-python/
-# df['Type'].value_counts()
-# df.groupby('Type').size().plot(kind='pie',
-#                                        y = "Type",
-#                                        label = "Malicious URL?",
-#                                        autopct='%1.1f%%')
-
-# benign_url = df[df["Type"] == 0]
-# malicious_url  = df[df["Type"] == 1]
-
-# malicious_url_upsample = resample(malicious_url,
-#                                  replace=True,
-#                                  n_samples=len(benign_url),
-#                                  random_state=1)
-
-# data_upsampled = pd.concat([benign_url, malicious_url_upsample])
-
-# data_upsampled['Type'].value_counts()
-# data_upsampled.groupby('Type').size().plot(kind='pie',
-#                                        y = "Type",
-#                                        label = "Malicious URL?",
-#                                        autopct='%1.1f%%')
-
-# Get baseline for several models.
 
 lr = LogisticRegression(max_iter = 2000)
 cv = cross_val_score(lr,X_train,y_train,cv=5, scoring='recall')
@@ -66,6 +42,13 @@ bnb = BernoulliNB()
 cv = cross_val_score(bnb,X_train,y_train,cv=5, scoring = 'recall')
 print(mean(cv), '+/-', std(cv))
 
+lda = LinearDiscriminantAnalysis()
+cv = cross_val_score(lda,X_train,y_train,cv=5, scoring = 'recall')
+print(mean(cv), '+/-', std(cv))
+
+xgbc = XGBClassifier(eval_metric='error')
+cv = cross_val_score(xgbc,X_train,y_train,cv=5, scoring = 'recall')
+print(mean(cv), '+/-', std(cv))
 
 # Performance reporting function.
 def clf_performance(classifier, model_name):
@@ -73,12 +56,26 @@ def clf_performance(classifier, model_name):
     print('Best Score: {} +/- {}'.format(str(classifier.best_score_),str(classifier.cv_results_['std_test_score'][classifier.best_index_])))
     print('Best Parameters: ' + str(classifier.best_params_))
     
-# Hyperparameter tune best baseline model.
+# Hyperparameter tune best baseline models.
 gnb = GaussianNB()
 param_grid = {'var_smoothing': np.logspace(0,-9, num=100)}
 clf_gnb = GridSearchCV(gnb, param_grid = param_grid, cv = 5, scoring = 'recall', n_jobs = -1)
 best_clf_gnb = clf_gnb.fit(X_train,y_train)
 clf_performance(best_clf_gnb,'GaussianNB')
+
+lda = LinearDiscriminantAnalysis()
+param_grid = {'solver': ['svd']}
+clf_lda = GridSearchCV(lda, param_grid = param_grid, cv = 5, scoring = 'recall', n_jobs = -1)
+best_clf_lda = clf_lda.fit(X_train,y_train)
+clf_performance(best_clf_lda,'LinearDiscriminantAnalysis')
+
+xgbc = XGBClassifier(eval_metric='error')
+param_grid = {'learning_rate': [0.001], 'max_depth': np.arange(1,9),
+              'n_estimators': [100], 'scale_pos_weight': np.arange(5,10)}
+clf_xgbc = GridSearchCV(xgbc, param_grid = param_grid, cv = 5, scoring = 'recall', n_jobs = -1)
+best_clf_xgbc = clf_xgbc.fit(X_train,y_train)
+clf_performance(best_clf_xgbc,'XGBClassifier')
+
 
 # Evaluate model with best parameters.
 gnb = GaussianNB(var_smoothing = 0.2848035868435802)
@@ -87,6 +84,18 @@ y_pred = gnb.predict(X_test)
 print('Test recall: {}'.format(recall_score(y_test, y_pred)))
 print('Test accuracy: {}'.format(accuracy_score(y_test, y_pred)))
 
+lda = LinearDiscriminantAnalysis(solver='svd')
+lda.fit(X_train, y_train)
+y_pred = lda.predict(X_test)
+print('Test recall: {}'.format(recall_score(y_test, y_pred)))
+print('Test accuracy: {}'.format(accuracy_score(y_test, y_pred)))
+
+xgbc = XGBClassifier(eval_metric='error', learning_rate = 0.001, max_depth=4,
+                     n_estimators = 100, scale_pos_weight = 7)
+xgbc.fit(X_train, y_train)
+y_pred = xgbc.predict(X_test)
+print('Test recall: {}'.format(recall_score(y_test, y_pred)))
+print('Test accuracy: {}'.format(accuracy_score(y_test, y_pred)))
 
 # Create and reshape confusion matrix data.
 matrix = confusion_matrix(y_test, y_pred)
