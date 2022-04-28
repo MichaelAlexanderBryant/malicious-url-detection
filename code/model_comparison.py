@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -28,7 +27,6 @@ for idx, val in enumerate(df.columns[2:]):
     sorted_index_descent = df.groupby(['Model']).max().sort_values(by= val,ascending=False).index
     
     plt.figure(figsize=(10, 10))
-    # ax = sns.boxplot(y = df['Model'], x = df['Recall'], order = sorted_index_descent, color = light[0], boxprops=dict(alpha=.3))
     ax = sns.stripplot(y = df['Model'], x = df[val], hue = df['Sampling'], s=10, order = sorted_index_descent, alpha=0.75)
     ax.set_ylabel('')
     ax.set_xlabel(val)

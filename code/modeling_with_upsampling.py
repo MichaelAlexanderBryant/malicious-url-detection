@@ -5,7 +5,7 @@ Randomly guessing malicious website (type=1) produces a recall of 1, but accurac
 and precision scores of 0.12128.
 
 Recall is more important than precision, but I also wanted a better balance
-than the result from scoring by recall (which is largely due to the unbalanced
+than the result from scoring by recall (which is largely due to the imbalanced
 dataset). I therefore chose F1 as the metric for scoring and chose the best
 model based on test set recall, precision, and accuracy with recall having
 highest priority.
@@ -22,7 +22,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB, BernoulliNB
 from xgboost import XGBClassifier
-# from pyarc import CBA, TransactionDB
 from sklearn.model_selection import cross_val_score
 from numpy import mean, std
 from sklearn.model_selection import GridSearchCV 
@@ -37,7 +36,6 @@ y_train = pd.read_csv('../output/imputation/y_train.csv')
 X_test = pd.read_csv('../output/imputation/X_test.csv')
 y_test = pd.read_csv('../output/imputation/y_test.csv')
 
-# https://wellsr.com/python/upsampling-and-downsampling-imbalanced-data-in-python/
 train_data = pd.concat([X_train,y_train],axis=1)
 train_data.columns
 
@@ -66,13 +64,12 @@ lr = LogisticRegression(max_iter = 2000)
 cv = cross_val_score(lr,X_train,y_train,cv=5, scoring='f1')
 print(mean(cv), '+/-', std(cv))
 
-# Class_weight is a form of downsampling to accomodate unbalanced dataset.
+# Class_weight is a form of downsampling to accomodate imbalanced dataset.
 rf = RandomForestClassifier(random_state = 1)
 cv = cross_val_score(rf,X_train,y_train,cv=5, scoring = 'f1')
 print(mean(cv), '+/-', std(cv))
 
-# Class_weight is a form of cost-sensitive training to accomodate unbalanced dataset.
-# https://machinelearningmastery.com/cost-sensitive-svm-for-imbalanced-classification/
+# Class_weight is a form of cost-sensitive training to accomodate imbalanced dataset.
 svc = SVC(probability = True)
 cv = cross_val_score(svc,X_train,y_train,cv=5, scoring='f1')
 print(mean(cv), '+/-', std(cv))
@@ -92,8 +89,6 @@ print(mean(cv), '+/-', std(cv))
 xgbc = XGBClassifier(use_label_encoder = False, eval_metric='error')
 cv = cross_val_score(xgbc,X_train,y_train,cv=5, scoring = 'f1')
 print(mean(cv), '+/-', std(cv))
-
-# cba = CBA(support=0.20, confidence=0.5, algorithm="m1")
 
 # Performance reporting function.
 def clf_performance(classifier, model_name):
@@ -202,6 +197,7 @@ def test_performance(estimators,clf_names,X_test=X_test,y_test=y_test):
         plt.xlabel('Predicted label')
         plt.ylabel('True label')
         plt.title('Confusion Matrix for {}'.format(clf_names[idx]))
+        plt.savefig('../output/modeling/upsampling/confusion_matrix_{}.jpg'.format(clf_names[idx]), bbox_inches='tight')
         plt.show()
         
         # Plot ROC.
@@ -216,6 +212,7 @@ def test_performance(estimators,clf_names,X_test=X_test,y_test=y_test):
         plt.title('ROC for {}'.format(clf_names[idx]))
         plt.xlabel('False Positive Rate (1 - Specificity)')
         plt.ylabel('True Positive Rate (Sensitivity)')
+        plt.savefig('../output/modeling/upsampling/ROC_{}.jpg'.format(clf_names[idx]), bbox_inches='tight')
         plt.show()
 
         # Calculate ROC AUC.
@@ -223,15 +220,12 @@ def test_performance(estimators,clf_names,X_test=X_test,y_test=y_test):
         print('ROC AUC for {}: {}'.format(clf_names[idx],ROC_AUC))
 
         # Plot precision-recall curve.
-        # https://machinelearningmastery.com/roc-curves-and-precision-recall-curves-for-imbalanced-classification/
         precision, recall, _ = precision_recall_curve(y_test, pred_prob[:,1])
         plt.plot(recall, precision, marker='.', label='{}'.format(clf_names[idx]))
-        # axis labels
         plt.xlabel('Recall')
         plt.ylabel('Precision')
-        # show the legend
         plt.legend()
-        # show the plot
+        plt.savefig('../output/modeling/upsampling/PR_curve_{}.jpg'.format(clf_names[idx]), bbox_inches='tight')
         plt.show()
 
         # Calculate precision-recall AUC.
