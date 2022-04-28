@@ -16,6 +16,22 @@
 
 ### code/eda_and_cleaning.py
 
+### code/imputation.py
+
+### code/modeling_without_sampling_methods.py
+
+### code/modeling_with_downsampling.py
+
+### code/modeling_with_upsampling.py
+
+### ouput/eda_and_cleaning
+
+### output/imputation
+
+### output/modeling
+
+### dataset.csv
+
 ## Results
 
 <div align="center">
