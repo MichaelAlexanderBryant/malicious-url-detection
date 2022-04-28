@@ -22,6 +22,8 @@ numerical = ['URL_LENGTH',
              'APP_BYTES',
              'SOURCE_APP_PACKETS',
              'REMOTE_APP_PACKETS',
+             'SOURCE_APP_PACKETS',
+             'REMOTE_APP_PACKETS',
              'APP_PACKETS',
              'DNS_QUERY_TIMES']
 categorical = ['CHARSET',
@@ -242,7 +244,6 @@ for i in times:
     plt.ylabel('FREQUENCY')
     plt.show()
 
-<<<<<<< HEAD
 # Display unique in categorical variables.
 for j in categorical:
     print('-----------',j,'-----------')
