@@ -1,4 +1,4 @@
-# Detecting Malicious Websites 
+# Malicious URL Detection
 
 <div align="center">
 <figure>
