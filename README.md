@@ -1,5 +1,23 @@
 # Malicious URL Detection
 
+### Project Outcome
+
+### Code Used 
+
+**Python Version:** <br />
+**Packages:** <br />
+**For Web Framework Requirements:**  ```pip install -r requirements.txt```  
+
+## Malicious URL Dataset
+
+### Variables
+
+## Files
+
+### code/eda_and_cleaning.py
+
+## Results
+
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/stripplot_model_F1.jpg"><br/>
