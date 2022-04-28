@@ -42,7 +42,7 @@
 
 <div align="center">
 <figure>
-<img src="output/modeling/model_comparison/stripplot_model_PR AUC.jpg"><br/>
+<img src="output/modeling/model_comparison/stripplot_model_Precision-Recall AUC.jpg"><br/>
   <figcaption>Figure 6: Strip plot of precision-recall AUC per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
