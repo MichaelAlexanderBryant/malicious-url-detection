@@ -1,3 +1,10 @@
+# I tried changing priors for naive Bayes and linear discriminant analysis,
+# but was ineffective. However, all models are achieving an AUC (ROC) of 0.84.
+# Next try downsampling or upsampling. SMOTE will probably not be effective here,
+# because it relies on looking at nearest neighbors and this is high dimensional
+# data. Using random forest's built-in downsampling achieves an ROC (AUC) of 0.86.
+
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -25,8 +32,9 @@ lr = LogisticRegression(max_iter = 2000)
 cv = cross_val_score(lr,X_train,y_train,cv=5, scoring='recall')
 print(mean(cv), '+/-', std(cv))
 
-#random forest classifier with five-fold cross validation
-rf = RandomForestClassifier(random_state = 1)
+# random forest classifier with five-fold cross validation
+# Class_weight is a form of downsampling to accomodate unbalanced dataset.
+rf = RandomForestClassifier(random_state = 1, class_weight = {0:1,1:5})
 cv = cross_val_score(rf,X_train,y_train,cv=5, scoring = 'recall')
 print(mean(cv), '+/-', std(cv))
 
@@ -56,7 +64,20 @@ def clf_performance(classifier, model_name):
     print('Best Score: {} +/- {}'.format(str(classifier.best_score_),str(classifier.cv_results_['std_test_score'][classifier.best_index_])))
     print('Best Parameters: ' + str(classifier.best_params_))
     
-# Hyperparameter tune best baseline models.
+#random forest performance tuner
+rf = RandomForestClassifier(random_state = 1, class_weight = {0:1,1:5})
+param_grid =  {
+                'n_estimators': np.arange(8,20,2), 
+                'bootstrap': [True,False], #bagging (T) vs. pasting (F)
+                'max_depth': [10],
+                'max_features': ['auto','sqrt'],
+                'min_samples_leaf': np.arange(2,6,1),
+                'min_samples_split': np.arange(2,6,1)
+              }
+clf_rf_rnd = GridSearchCV(rf, param_grid = param_grid, cv = 5, scoring='recall', n_jobs = -1)
+best_clf_rf_rnd = clf_rf_rnd.fit(X_train,y_train)
+clf_performance(best_clf_rf_rnd,'Random Forest')
+
 gnb = GaussianNB()
 param_grid = {'var_smoothing': np.logspace(0,-9, num=100)}
 clf_gnb = GridSearchCV(gnb, param_grid = param_grid, cv = 5, scoring = 'recall', n_jobs = -1)
@@ -78,6 +99,14 @@ clf_performance(best_clf_xgbc,'XGBClassifier')
 
 
 # Evaluate model with best parameters.
+rf = RandomForestClassifier(random_state = 1, class_weight = {0:1,1:5},
+                            bootstrap = False, max_depth = 10, max_features='auto',
+                            min_samples_leaf = 3, min_samples_split = 2, n_estimators = 8)
+rf.fit(X_train, y_train)
+y_pred = rf.predict(X_test)
+print('Test recall: {}'.format(recall_score(y_test, y_pred)))
+print('Test accuracy: {}'.format(accuracy_score(y_test, y_pred)))
+
 gnb = GaussianNB(var_smoothing = 0.2848035868435802)
 gnb.fit(X_train, y_train)
 y_pred = gnb.predict(X_test)
@@ -91,14 +120,15 @@ print('Test recall: {}'.format(recall_score(y_test, y_pred)))
 print('Test accuracy: {}'.format(accuracy_score(y_test, y_pred)))
 
 # XGBClassifier works well, because scale_pos_weight counteracts the imbalanced
-# dataset. Tried changing priors for naive Bayes and linear discriminant analysis,
-# but was ineffective. Next try sampling methods (e.g., SMOTE, downsampling).
+# dataset.
 xgbc = XGBClassifier(eval_metric='error', learning_rate = 0.001, max_depth=4,
                      n_estimators = 100, scale_pos_weight = 7)
 xgbc.fit(X_train, y_train)
 y_pred = xgbc.predict(X_test)
 print('Test recall: {}'.format(recall_score(y_test, y_pred)))
 print('Test accuracy: {}'.format(accuracy_score(y_test, y_pred)))
+
+
 
 # Create and reshape confusion matrix data.
 matrix = confusion_matrix(y_test, y_pred)
