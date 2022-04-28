@@ -9,14 +9,14 @@ from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB, BernoulliNB
 from sklearn.model_selection import cross_val_score
 from numpy import mean, std
-#ml algorithm tuner
 from sklearn.model_selection import GridSearchCV 
 from sklearn.metrics import recall_score, accuracy_score, confusion_matrix
+from sklearn import metrics
 
+# Load split data.
 X_train = pd.read_csv('../output/imputation/X_train.csv')
 y_train = pd.read_csv('../output/imputation/y_train.csv')
 y_train = np.ravel(np.array(y_train))
-
 X_test = pd.read_csv('../output/imputation/X_test.csv')
 y_test = pd.read_csv('../output/imputation/y_test.csv')
 
@@ -43,6 +43,8 @@ y_test = pd.read_csv('../output/imputation/y_test.csv')
 #                                        label = "Malicious URL?",
 #                                        autopct='%1.1f%%')
 
+# Get baseline for several models.
+
 lr = LogisticRegression(max_iter = 2000)
 cv = cross_val_score(lr,X_train,y_train,cv=5, scoring='recall')
 print(mean(cv), '+/-', std(cv))
@@ -65,19 +67,20 @@ cv = cross_val_score(bnb,X_train,y_train,cv=5, scoring = 'recall')
 print(mean(cv), '+/-', std(cv))
 
 
-#performance reporting function
+# Performance reporting function.
 def clf_performance(classifier, model_name):
     print(model_name)
     print('Best Score: {} +/- {}'.format(str(classifier.best_score_),str(classifier.cv_results_['std_test_score'][classifier.best_index_])))
     print('Best Parameters: ' + str(classifier.best_params_))
     
-#logistic regression performance tuner
+# Hyperparameter tune best baseline model.
 gnb = GaussianNB()
 param_grid = {'var_smoothing': np.logspace(0,-9, num=100)}
 clf_gnb = GridSearchCV(gnb, param_grid = param_grid, cv = 5, scoring = 'recall', n_jobs = -1)
 best_clf_gnb = clf_gnb.fit(X_train,y_train)
 clf_performance(best_clf_gnb,'GaussianNB')
 
+# Evaluate model with best parameters.
 gnb = GaussianNB(var_smoothing = 0.2848035868435802)
 gnb.fit(X_train, y_train)
 y_pred = gnb.predict(X_test)
@@ -85,17 +88,15 @@ print('Test recall: {}'.format(recall_score(y_test, y_pred)))
 print('Test accuracy: {}'.format(accuracy_score(y_test, y_pred)))
 
 
-#create and reshape confusion matrix data
+# Create and reshape confusion matrix data.
 matrix = confusion_matrix(y_test, y_pred)
 matrix = matrix.astype('float') / matrix.sum(axis=1)[:, np.newaxis]
 
-#plot as heatmap
+# Plot confusion matrix.
 plt.figure(figsize=(16,7))
 sns.set(font_scale=1.4)
 sns.heatmap(matrix, annot=True, annot_kws={'size':10},
             linewidths=0.2, vmin=0, vmax=1)
-
-#plot settings
 class_names = ['Malicious', 'Benign']
 tick_marks = np.arange(len(class_names))
 tick_marks2 = tick_marks + 0.5
@@ -107,9 +108,7 @@ plt.title('Confusion Matrix for GaussianNB')
 plt.show()
 
 
-#plot ROC curve for best classifiers
-from sklearn import metrics
-
+# Plot ROC.
 pred_prob = gnb.predict_proba(X_test)
 fpr, tpr, thresholds = metrics.roc_curve(y_test, pred_prob[:,1])
 fig, ax = plt.subplots(figsize=(16, 10))
@@ -123,4 +122,5 @@ plt.xlabel('False Positive Rate (1 - Specificity)')
 plt.ylabel('True Positive Rate (Sensitivity)')
 plt.show()
 
+# Calculate AUC (ROC).
 print('AUC: {}'.format(metrics.auc(fpr, tpr)))

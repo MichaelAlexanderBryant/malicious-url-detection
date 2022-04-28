@@ -70,15 +70,11 @@ pipeline_numerical = make_pipeline(
 
 
        
-
+# Function to execute preprocessing for train and test sets.
 def preprocess_dataset(X, categorical_1=categorical_1, categorical_2=categorical_2,
                        numerical=numerical, train=True):
-    
-    
-    
     if train == True:
-              
-
+             
         X = pd.concat(
             [pd.DataFrame(pipeline_categorical_1.fit_transform(X[categorical_1]).toarray()),
              pd.DataFrame(pipeline_categorical_2.fit_transform(X[categorical_2]).toarray()),
@@ -99,23 +95,22 @@ def preprocess_dataset(X, categorical_1=categorical_1, categorical_2=categorical
     
     return X
     
-
+# Apply function to train and test data.
 X_train = preprocess_dataset(X_train)
 X_test = preprocess_dataset(X_test, train=False)
     
+# Check for missing values.
 X_train.isna().sum().sum()
 X_test.isna().sum().sum()
 
+# Check shape of matricies.
 X_train.shape
 X_test.shape
 y_train.shape
 y_test.shape
 
-X_train.dtypes
-
+# Export split data.
 X_train.to_csv('../output/imputation/X_train.csv', index=False)
 X_test.to_csv('../output/imputation/X_test.csv', index=False)
 y_train.to_csv('../output/imputation/y_train.csv', index=False)
 y_test.to_csv('../output/imputation/y_test.csv', index=False)
-
-
