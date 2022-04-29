@@ -8,36 +8,6 @@ Over 70% of all system intrusion breaches involve malware, and 32% of all malwar
 
 The models I chose were due to their potential to handle an imbalanced dataset. The dataset I used consisted of 12.1% malicious URLS and 87.9% benign. I chose models which have the ability to adjust prior probabilities, change class weights, or have a tunable cost parameter. I also tried downsampling and upsampling.
 
-### Code Used 
-
-**Python Version:** <br />
-**Packages:** <br />
-**For Web Framework Requirements:**  ```pip install -r requirements.txt```  
-
-## Malicious URL Dataset
-
-### Variables
-
-## Files
-
-### code/eda_and_cleaning.py
-
-### code/imputation.py
-
-### code/modeling_without_sampling_methods.py
-
-### code/modeling_with_downsampling.py
-
-### code/modeling_with_upsampling.py
-
-### ouput/eda_and_cleaning
-
-### output/imputation
-
-### output/modeling
-
-### dataset.csv
-
 ## Results
 
 <div align="center">
@@ -55,7 +25,6 @@ The models I chose were due to their potential to handle an imbalanced dataset. 
 </figure>
 <br/><br/>
 </div>
-
 
 <div align="center">
 <figure>
