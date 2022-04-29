@@ -12,8 +12,8 @@ dark_bright = ['#000000', '#265dab', '#df5c24', '#059749', '#e5126d', '#9d732a',
 grid = ['#e0e0e0']
 
 #plot parameters
-plt.rcParams["axes.spines.right"] = False
-plt.rcParams["axes.spines.top"] = False
+plt.rcParams["axes.spines.right"] = True
+plt.rcParams["axes.spines.top"] = True
 
 df_no_sampling = pd.read_csv('../output/modeling/no_sampling/df_scores.csv')
 df_upsampling = pd.read_csv('../output/modeling/upsampling/df_scores.csv')
@@ -29,14 +29,17 @@ for idx, val in enumerate(df.columns[2:]):
     df = df.sort_values(by=['Model', 'Sampling',val], ascending=True)
     
     plt.figure(figsize=(10, 10))
-    ax = sns.scatterplot(data = df, y = 'Model', x = val, hue = 'Sampling', style='Sampling', s=225, linewidth=0, alpha=0.75, markers=('o','s','^'), palette=[medium[1],medium[8],medium[3]])
+    # ax = sns.scatterplot(data = df, y = 'Model', x = val, hue = 'Sampling', style='Sampling', s=225, linewidth=0, alpha=0.75, markers=('o','s','^'), palette=[medium[1],medium[8],medium[3]])
+    ax = sns.stripplot(y = df['Model'], x = df[val], hue = df['Sampling'], s=25, jitter=False, order=sorted_index_descent, alpha=0.75, palette=[medium[1],medium[8],medium[3]])
     ax.set_ylabel('')
     ax.set_xlabel(val)
     ax.set_xlim([-.1,1.1])
-    ax.spines["bottom"].set_color(light[0])
-    ax.spines["left"].set_color(light[0])
-    ax.xaxis.label.set_color(dark_bright[0])
-    ax.yaxis.label.set_color(dark_bright[0])
+    ax.spines["bottom"].set_color(dark_bright[0])
+    ax.spines["left"].set_color(dark_bright[0])
+    ax.spines["top"].set_color(dark_bright[0])
+    ax.spines["right"].set_color(dark_bright[0])
+    # ax.xaxis.label.set_color(dark_bright[0])
+    # ax.yaxis.label.set_color(dark_bright[0])
     ax.title.set_color(dark_bright[0])
     ax.tick_params(axis='x', colors = light[0], labelcolor=dark_bright[0])
     ax.tick_params(axis='y', colors = light[0], labelcolor=dark_bright[0])
