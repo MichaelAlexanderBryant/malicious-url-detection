@@ -27,7 +27,7 @@ for idx, val in enumerate(df.columns[2:]):
     sorted_index_descent = df.groupby(['Model']).max().sort_values(by= val,ascending=False).index
     
     plt.figure(figsize=(10, 10))
-    ax = sns.stripplot(y = df['Model'], x = df[val], hue = df['Sampling'], s=10, order = sorted_index_descent, alpha=0.75)
+    ax = sns.stripplot(y = df['Model'], x = df[val], hue = df['Sampling'], jitter=False, s=10, order = sorted_index_descent, alpha=0.75)
     ax.set_ylabel('')
     ax.set_xlabel(val)
     ax.set_xlim([-.1,1.1])
