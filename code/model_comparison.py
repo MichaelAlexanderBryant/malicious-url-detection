@@ -26,10 +26,9 @@ df = pd.concat([df_no_sampling, df_upsampling, df_downsampling],
 for idx, val in enumerate(df.columns[2:]):
     sorted_index_descent = df.groupby(['Model']).max().sort_values(by= val,ascending=False).index
     
-    df = df.sort_values(by=['Sampling', val], ascending=False)
+    df = df.sort_values(by=['Model', 'Sampling',val], ascending=True)
     
     plt.figure(figsize=(10, 10))
-    # ax = sns.stripplot(y = df['Model'], x = df[val], hue = df['Sampling'], jitter=0.055, s=15, order = sorted_index_descent, alpha=0.75)
     ax = sns.scatterplot(data = df, y = 'Model', x = val, hue = 'Sampling', style='Sampling', s=225, linewidth=0, alpha=0.75, markers=('o','s','^'), palette=[medium[1],medium[8],medium[3]])
     ax.set_ylabel('')
     ax.set_xlabel(val)
@@ -44,7 +43,7 @@ for idx, val in enumerate(df.columns[2:]):
     ax.yaxis.set_ticks_position('none')
     ax.grid(color = 'w', axis='x')
     ax.grid(color = grid[0], axis='y')
-    ax.legend(loc="upper left")
+    ax.legend(loc="upper left")    
     ax.set_axisbelow(True)
     
     plt.savefig('../output/modeling/model_comparison/stripplot_model_{}.jpg'.format(val), bbox_inches='tight')
