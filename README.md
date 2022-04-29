@@ -6,7 +6,7 @@ Over 70% of all system intrusion breaches involve malware, and 32% of all malwar
 
 ### Project Outcome
 
-The models published in scientific journals on detecting malicious URLs are highly successful. They achieve accuracy, recall, and precision scores +95%. The top models in the literature use gradient boosting and ensemble learning. I took a different approach due to the imbalanced dataset where 12.1% of URLs were malicious and 87.9% were benign. I chose models which have the ability to adjust prior probabilities, change class weights, or have a tunable cost parameter. I also tried downsampling and upsampling. My best model, XGBClassifier, achieved an accuarcy of 94.4%, a precision of 73.8%, and a recall of 83.1%. The model was deployed as an API that can be used to check websites for safe access. 
+The models published in scientific journals on detecting malicious URLs use gradient boosting and ensemble learning. I took a different approach due to the imbalanced dataset where 12.1% of URLs were malicious and 87.9% were benign. I chose models which have the ability to adjust prior probabilities, change class weights, or have a tunable cost parameter. I also tried downsampling and upsampling. My best model, XGBClassifier, achieved an accuarcy of 94.4%, a precision of 73.8%, and a recall of 83.1%. The model was deployed as an API that can be used to check websites for safe access. 
 
 ### Code Used 
 
