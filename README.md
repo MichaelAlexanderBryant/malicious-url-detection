@@ -6,7 +6,7 @@ Over 70% of all system intrusion breaches involve malware, and 32% of all malwar
 
 ### Project Outcome
 
-The models I chose were due to their potential to handle an imbalanced dataset. The dataset I used consisted of 12.1% malicious URLS and 87.9% benign. I chose models which have the ability to adjust prior probabilities, change class weights, or have a tunable cost parameter. I also tried downsampling and upsampling. My best model, XGBClassifier, achieved an accuarcy of 94.4%, a precision of 73.8%, and a recall of 83.1%. The model was deployed as an API that can be used to check websites for safe access. 
+The models I chose were due to their potential to handle an imbalanced dataset. The dataset I used consisted of 12.1% malicious URLS and 87.9% benign. I chose models which have the ability to adjust prior probabilities, change class weights, or have a tunable cost parameter. I also tried downsampling and upsampling. The model was deployed as an API that can be used to check websites for safe access. 
 
 ### Code Used 
 
