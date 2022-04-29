@@ -37,7 +37,7 @@
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/stripplot_model_F1.jpg"><br/>
-  <figcaption>Figure 1: Strip plot of F1 scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 1: F1 scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
@@ -45,7 +45,7 @@
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/stripplot_model_Recall.jpg"><br/>
-  <figcaption>Figure 2: Strip plot of recall scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 2: Recall scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
@@ -53,7 +53,7 @@
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/stripplot_model_Precision.jpg"><br/>
-  <figcaption>Figure 3: Strip plot of precision scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 3: Precision scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
@@ -61,7 +61,7 @@
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/stripplot_model_Accuracy.jpg"><br/>
-  <figcaption>Figure 4: Strip plot of accuracy scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 4: Accuracy scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
@@ -69,7 +69,7 @@
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/stripplot_model_ROC AUC.jpg"><br/>
-  <figcaption>Figure 5: Strip plot of ROC AUC per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 5: ROC AUC per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
@@ -77,7 +77,7 @@
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/stripplot_model_Precision-Recall AUC.jpg"><br/>
-  <figcaption>Figure 6: Strip plot of precision-recall AUC per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 6: Precision-recall AUC per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
