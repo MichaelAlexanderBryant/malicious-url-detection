@@ -42,7 +42,7 @@ for idx, val in enumerate(df.columns[2:]):
     ax.tick_params(axis='x', colors = light[0], labelcolor=dark_bright[0])
     ax.tick_params(axis='y', colors = light[0], labelcolor=dark_bright[0])
     ax.yaxis.set_ticks_position('none')
-    ax.grid(color = grid[0], axis='x')
+    ax.grid(color = 'w', axis='x')
     ax.grid(color = grid[0], axis='y')
     ax.legend(loc="upper left")
     ax.set_axisbelow(True)
