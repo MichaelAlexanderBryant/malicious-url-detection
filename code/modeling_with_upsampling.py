@@ -15,14 +15,15 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.model_selection import StratifiedKFold
 from sklearn.utils import resample
+import itertools as it
 from sklearn.linear_model import LogisticRegression
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB, BernoulliNB
 from xgboost import XGBClassifier
-from sklearn.model_selection import cross_val_score
 from numpy import mean, std
 from sklearn.model_selection import GridSearchCV 
 from sklearn.metrics import (recall_score, accuracy_score, f1_score,
@@ -31,80 +32,165 @@ from sklearn.metrics import (recall_score, accuracy_score, f1_score,
 from sklearn import metrics
 
 # Load split data.
-X_train = pd.read_csv('../output/imputation/X_train.csv')
-y_train = pd.read_csv('../output/imputation/y_train.csv')
+X_train_valid = pd.read_csv('../output/imputation/X_train.csv')
+y_train_valid = pd.read_csv('../output/imputation/y_train.csv')
 X_test = pd.read_csv('../output/imputation/X_test.csv')
 y_test = pd.read_csv('../output/imputation/y_test.csv')
 
-train_data = pd.concat([X_train,y_train],axis=1)
-train_data.columns
 
-malicious_websites = train_data[train_data["Type"] == 1]
-benign_websites = train_data[train_data["Type"] == 0]
-print(malicious_websites.shape)
-print(benign_websites.shape)
 
-malicious_upsample = resample(malicious_websites,
-             replace=True,
-             n_samples=len(benign_websites),
-             random_state=1)
+def upsampleCV(clf, X_train_valid, y_train_valid, cv, scoring):
 
-print(malicious_upsample.shape)
-malicious_upsample.columns
+    cv_scores = []
+    
+    skf = StratifiedKFold(n_splits=cv, random_state=None, shuffle=False)
+    for train_index, valid_index in skf.split(X_train_valid, y_train_valid):
 
-train_data = pd.concat([malicious_upsample, benign_websites], axis=0)
-train_data.shape
-train_data.columns
+        X_train, X_valid = X_train_valid.iloc[train_index,:], X_train_valid.iloc[valid_index,:]
+        y_train, y_valid = y_train_valid.iloc[train_index,:], y_train_valid.iloc[valid_index,:]
+        
+        train_data = pd.concat([X_train,y_train],axis=1)
 
-X_train = train_data.copy()
-y_train = X_train.pop('Type')
+        malicious_websites = train_data[train_data["Type"] == 1]
+        benign_websites = train_data[train_data["Type"] == 0]
+
+        malicious_upsample = resample(malicious_websites,
+                     replace=True,
+                     n_samples=len(benign_websites),
+                     random_state=1)
+
+        train_data = pd.concat([malicious_upsample, benign_websites], axis=0)
+
+        X_train = train_data.copy()
+        y_train = X_train.pop('Type')
+        
+        clf.fit(X_train,y_train)
+        y_pred = clf.predict(X_valid)
+        
+        if scoring == 'f1':
+            cv_scores.append(f1_score(y_valid, y_pred))
+            
+    return cv_scores
+
 
 
 lr = LogisticRegression(max_iter = 2000)
-cv = cross_val_score(lr,X_train,y_train,cv=5, scoring='f1')
-print(mean(cv), '+/-', std(cv))
+cv = upsampleCV(lr,X_train_valid,y_train_valid,cv=5, scoring='f1')
+print("LogisticRegression: {} +/- {}".format(mean(cv),std(cv)))
 
 # Class_weight is a form of downsampling to accomodate imbalanced dataset.
 rf = RandomForestClassifier(random_state = 1)
-cv = cross_val_score(rf,X_train,y_train,cv=5, scoring = 'f1')
-print(mean(cv), '+/-', std(cv))
+cv = upsampleCV(rf,X_train_valid,y_train_valid,cv=5, scoring='f1')
+print("RandomForestClassifier: {} +/- {}".format(mean(cv),std(cv)))
 
 # Class_weight is a form of cost-sensitive training to accomodate imbalanced dataset.
 svc = SVC(probability = True)
-cv = cross_val_score(svc,X_train,y_train,cv=5, scoring='f1')
-print(mean(cv), '+/-', std(cv))
+cv = upsampleCV(svc,X_train_valid,y_train_valid,cv=5, scoring='f1')
+print("SVC: {} +/- {}".format(mean(cv),std(cv)))
 
 gnb = GaussianNB()
-cv = cross_val_score(gnb,X_train,y_train,cv=5, scoring = 'f1')
-print(mean(cv), '+/-', std(cv))
+cv = upsampleCV(gnb,X_train_valid,y_train_valid,cv=5, scoring='f1')
+print("GaussianNB: {} +/- {}".format(mean(cv),std(cv)))
 
 bnb = BernoulliNB()
-cv = cross_val_score(bnb,X_train,y_train,cv=5, scoring = 'f1')
-print(mean(cv), '+/-', std(cv))
+cv = upsampleCV(bnb,X_train_valid,y_train_valid,cv=5, scoring='f1')
+print("BernoulliNB: {} +/- {}".format(mean(cv),std(cv)))
 
 lda = LinearDiscriminantAnalysis()
-cv = cross_val_score(lda,X_train,y_train,cv=5, scoring = 'f1')
-print(mean(cv), '+/-', std(cv))
+cv = upsampleCV(lda,X_train_valid,y_train_valid,cv=5, scoring='f1')
+print("LinearDiscriminatAnalysis: {} +/- {}".format(mean(cv),std(cv)))
 
 xgbc = XGBClassifier(use_label_encoder = False, eval_metric='error')
-cv = cross_val_score(xgbc,X_train,y_train,cv=5, scoring = 'f1')
-print(mean(cv), '+/-', std(cv))
+cv = upsampleCV(xgbc,X_train_valid,y_train_valid,cv=5, scoring='f1')
+print("XGBClassifier: {} +/- {}".format(mean(cv),std(cv)))
 
-# Performance reporting function.
-def clf_performance(classifier, model_name):
-    print(model_name)
-    print('Best Score: {} +/- {}'.format(str(classifier.best_score_),str(
-        classifier.cv_results_['std_test_score'][classifier.best_index_])))
-    print('Best Parameters: ' + str(classifier.best_params_))
+
+
+
+
+
+
+
+
+
+def upsample_gridsearchCV(clf, X, y, cv, scoring, param_grid):
     
+    parameters = list(param_grid.keys())
+    combinations = list(it.product(*(param_grid[Name] for Name in param_grid)))
+    
+    parameter_combinations = []
+    for idx, val in enumerate(combinations):
+        parameter_set = dict(zip(parameters,val))
+        parameter_combinations.append(parameter_set)
+        
+
+    df_scores=pd.DataFrame()
+    skf = StratifiedKFold(n_splits=cv, random_state=None, shuffle=False)
+    for train_index, valid_index in skf.split(X_train_valid, y_train_valid):
+
+        X_train, X_valid = X_train_valid.iloc[train_index,:], X_train_valid.iloc[valid_index,:]
+        y_train, y_valid = y_train_valid.iloc[train_index,:], y_train_valid.iloc[valid_index,:]
+        
+        train_data = pd.concat([X_train,y_train],axis=1)
+
+        malicious_websites = train_data[train_data["Type"] == 1]
+        benign_websites = train_data[train_data["Type"] == 0]
+
+        malicious_upsample = resample(malicious_websites,
+                     replace=True,
+                     n_samples=len(benign_websites),
+                     random_state=1)
+
+        train_data = pd.concat([malicious_upsample, benign_websites], axis=0)
+
+        X_train = train_data.copy()
+        y_train = X_train.pop('Type')
+    
+        scores = []
+        for i in parameter_combinations:
+            
+            clf.set_params(**i)
+            y_pred = clf.fit(X_train, y_train).predict(X_valid)
+            
+            if scoring == 'f1':
+                scores.append(f1_score(y_valid,y_pred))
+                
+        if len(df_scores) == 0:
+            df_scores = pd.DataFrame([scores])
+        else:
+            df_scores = df_scores.append(pd.DataFrame([scores]),ignore_index=True)
+            
+    best_parameters_idx = np.argmax(np.mean(df_scores,axis=0))
+    best_parameters = parameter_combinations[best_parameters_idx]
+    mean_score = np.mean(df_scores,axis=0)[best_parameters_idx]
+    std_score = np.std(df_scores,axis=0)[best_parameters_idx]
+            
+    return best_parameters, mean_score, std_score
+            
+# Performance reporting function.
+def clf_performance(best_parameters, mean_score, std_score, model_name):
+    print(model_name)
+    print('Best Score: {} +/- {}'.format(str(mean_score),str(std_score)))
+    print('Best Parameters: ' + str(best_parameters))
+    
+def fit_all_training_data(clf, best_parameters, X_train_valid=X_train_valid,
+                          y_train_valid=y_train_valid):
+
+    best_clf = clf.set_params(**best_parameters).fit(X_train_valid, y_train_valid.values.ravel())
+    
+    return best_clf
+
+
+
 lr = LogisticRegression()
 param_grid = {'max_iter' : [15000],
               'C' : np.arange(.001,.015,.001)
              }
-clf_lr = GridSearchCV(lr, param_grid = param_grid, cv = 5, scoring='f1',
-                      n_jobs = -1)
-best_clf_lr = clf_lr.fit(X_train,y_train)
-clf_performance(best_clf_lr,'Logistic Regression')
+best_parameters, mean_score, std_score = upsample_gridsearchCV(
+    lr,X_train_valid, y_train_valid, cv=5,
+    scoring = 'f1', param_grid=param_grid)
+clf_performance(best_parameters, mean_score, std_score,'\nLogistic Regression')
+clf_lr = fit_all_training_data(lr,best_parameters)
     
 
 rf = RandomForestClassifier(random_state = 1)
@@ -116,10 +202,11 @@ param_grid =  {
                 'min_samples_leaf': np.arange(2,6,1),
                 'min_samples_split': np.arange(2,6,1)
               }
-clf_rf = GridSearchCV(rf, param_grid = param_grid, cv = 5, scoring='f1',
-                          n_jobs = -1)
-best_clf_rf = clf_rf.fit(X_train,y_train)
-clf_performance(best_clf_rf,'RandomForestClassifier')
+best_parameters, mean_score, std_score = upsample_gridsearchCV(
+    rf,X_train_valid, y_train_valid, cv=5,
+    scoring = 'f1', param_grid=param_grid)
+clf_performance(best_parameters, mean_score, std_score,'\nRandomForestClassifier')
+clf_rf = fit_all_training_data(rf,best_parameters)
 
 
 svc = SVC(probability = True, random_state = 1)
@@ -128,32 +215,36 @@ param_grid = {
               'gamma': [1, 1e-1, 1e-2, 1e-3, 1e-4],
               'C': np.arange(40,70,5)
              }
-clf_svc = GridSearchCV(svc, param_grid = param_grid, cv = 5, scoring = 'f1',
-                       n_jobs = -1)
-best_clf_svc = clf_svc.fit(X_train,y_train)
-clf_performance(best_clf_svc,'SVC')
+best_parameters, mean_score, std_score = upsample_gridsearchCV(
+    svc,X_train_valid, y_train_valid, cv=5,
+    scoring = 'f1', param_grid=param_grid)
+clf_performance(best_parameters, mean_score, std_score,'\nSVC')
+clf_svc = fit_all_training_data(svc,best_parameters)
 
 gnb = GaussianNB()
 param_grid = {'var_smoothing': np.logspace(0,-9, num=100)}
-clf_gnb = GridSearchCV(gnb, param_grid = param_grid, cv = 5, scoring = 'f1',
-                       n_jobs = -1)
-best_clf_gnb = clf_gnb.fit(X_train,y_train)
-clf_performance(best_clf_gnb,'GaussianNB')
+best_parameters, mean_score, std_score = upsample_gridsearchCV(
+    gnb,X_train_valid, y_train_valid, cv=5,
+    scoring = 'f1', param_grid=param_grid)
+clf_performance(best_parameters, mean_score, std_score,'\nGaussianNB')
+clf_gnb = fit_all_training_data(gnb,best_parameters)
 
 lda = LinearDiscriminantAnalysis()
 param_grid = {'solver': ['svd']}
-clf_lda = GridSearchCV(lda, param_grid = param_grid, cv = 5, scoring = 'f1',
-                       n_jobs = -1)
-best_clf_lda = clf_lda.fit(X_train,y_train)
-clf_performance(best_clf_lda,'LinearDiscriminantAnalysis')
+best_parameters, mean_score, std_score = upsample_gridsearchCV(
+    lda,X_train_valid, y_train_valid, cv=5,
+    scoring = 'f1', param_grid=param_grid)
+clf_performance(best_parameters, mean_score, std_score,'\nLinearDiscriminantAnalysis')
+clf_lda = fit_all_training_data(lda,best_parameters)
 
-xgbc = XGBClassifier(eval_metric='error')
+xgbc = XGBClassifier(eval_metric='error', verbosity=0)
 param_grid = {'learning_rate': [0.001], 'max_depth': np.arange(1,9),
               'n_estimators': [100], 'scale_pos_weight': np.arange(5,10)}
-clf_xgbc = GridSearchCV(xgbc, param_grid = param_grid, cv = 5, scoring = 'f1',
-                        n_jobs = -1)
-best_clf_xgbc = clf_xgbc.fit(X_train,y_train)
-clf_performance(best_clf_xgbc,'XGBClassifier')
+best_parameters, mean_score, std_score = upsample_gridsearchCV(
+    xgbc,X_train_valid, y_train_valid, cv=5,
+    scoring = 'f1', param_grid=param_grid)
+clf_performance(best_parameters, mean_score, std_score,'\nXGBClassifier')
+clf_xgbc = fit_all_training_data(xgbc,best_parameters)
 
 estimators = [clf_rf, clf_gnb, clf_lda, clf_lr, clf_svc, clf_xgbc]
 names = ['RandomForestClassifier',
