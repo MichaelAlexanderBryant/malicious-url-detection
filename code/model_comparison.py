@@ -50,5 +50,5 @@ for idx, val in enumerate(df.columns[2:]):
     # ax.grid(color = grid[0], axis='y')
     # ax.legend(loc="upper left")    
     # ax.set_axisbelow(True)
-    # plt.savefig('../output/modeling/model_comparison/stripplot_model_{}.jpg'.format(val), bbox_inches='tight')
+    plt.savefig('../output/modeling/model_comparison/catplot_model_{}.jpg'.format(val), bbox_inches='tight')
     plt.show()
