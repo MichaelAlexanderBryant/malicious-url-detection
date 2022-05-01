@@ -1,5 +1,5 @@
 """
-This is an anomoly detection system that:
+This is an anomaly detection system that:
     1. takes ~60% of the benign website data (which is the training data)
     2. imputes the data
     3. transforms that data into Gaussian distributions
