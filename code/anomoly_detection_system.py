@@ -157,11 +157,3 @@ def p_value_threshold_search(search_range, p_values, testing_targets):
 
 p_thresholds,accuracy,recall,precision = p_value_threshold_search(
     np.linspace(1e-600, 1e-400, 10), p_values, y_valid)
-
-accuracy
-recall
-p_thresholds
-p_values
-
-
-X_valid.iloc[1,:]
