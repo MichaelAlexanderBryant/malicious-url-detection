@@ -12,7 +12,7 @@ The models I chose were due to their potential to handle an imbalanced dataset. 
 
 <div align="center">
 <figure>
-<img src="output/modeling/model_comparison/stripplot_model_Recall.jpg"><br/>
+<img src="output/modeling/model_comparison/catplot_model_Recall.jpg"><br/>
   <figcaption>Figure 1: Recall scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
@@ -20,7 +20,7 @@ The models I chose were due to their potential to handle an imbalanced dataset. 
 
 <div align="center">
 <figure>
-<img src="output/modeling/model_comparison/stripplot_model_Precision.jpg"><br/>
+<img src="output/modeling/model_comparison/catplot_model_Precision.jpg"><br/>
   <figcaption>Figure 2: Precision scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
@@ -28,7 +28,7 @@ The models I chose were due to their potential to handle an imbalanced dataset. 
 
 <div align="center">
 <figure>
-<img src="output/modeling/model_comparison/stripplot_model_Accuracy.jpg"><br/>
+<img src="output/modeling/model_comparison/catplot_model_Accuracy.jpg"><br/>
   <figcaption>Figure 3: Accuracy scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
