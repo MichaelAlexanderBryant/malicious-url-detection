@@ -31,8 +31,8 @@ for idx, val in enumerate(df.columns[2:]):
     plt.figure(figsize=(10, 10))
     #ax = sns.scatterplot(data = df, y = 'Model', x = val, hue = 'Sampling', style='Sampling', s=225, linewidth=0, alpha=0.75, markers=('o','s','^'), palette=[medium[1],medium[8],medium[3]])
     #ax = sns.stripplot(y = df['Model'], x = df[val], hue = df['Sampling'], s=15, jitter=False, order=sorted_index_descent, alpha=0.75, palette=[medium[1],medium[8],medium[3]])
-    ax = sns.catplot(data = df, y = 'Model', x = val, hue = 'Sampling', kind='bar');
-    ax.set(xlim=(0,1));
+    ax = sns.catplot(data = df, y = 'Model', x = val, hue = 'Sampling', kind='bar')
+    ax.set(xlim=(0,1))
     # ax.set_ylabel('')
     # ax.set_xlabel(val)
     # ax.set_xlim([-.1,1.1])
@@ -51,4 +51,4 @@ for idx, val in enumerate(df.columns[2:]):
     # ax.legend(loc="upper left")    
     # ax.set_axisbelow(True)
     # plt.savefig('../output/modeling/model_comparison/stripplot_model_{}.jpg'.format(val), bbox_inches='tight')
-    plt.show();
+    plt.show()
