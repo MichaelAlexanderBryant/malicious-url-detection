@@ -28,7 +28,7 @@ from numpy import mean, std
 import pickle
 from sklearn.metrics import (recall_score, accuracy_score, f1_score,
                              precision_score, confusion_matrix,
-                             precision_recall_curve)
+                             precision_recall_curve, cohen_kappa_score)
 from sklearn import metrics
 
 # Load split data.
@@ -303,6 +303,8 @@ def test_performance(estimators,clf_names,X_test=X_test,y_test=y_test):
         print('Test F1: {}'.format(test_f1))
         test_accuracy = accuracy_score(y_test, y_pred)
         print('Test accuracy: {}'.format(test_accuracy))
+        cohen_kappa = cohen_kappa_score(y_test, y_pred)
+        print('Test kappa: {}'.format(cohen_kappa))
         
         # Create and reshape confusion matrix data.
         matrix = confusion_matrix(y_test, y_pred)

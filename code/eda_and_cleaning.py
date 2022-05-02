@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 import re
+sns.set_theme(style="whitegrid")
 
 # Load dataset.
 df = pd.read_csv('../dataset.csv')
@@ -21,8 +23,8 @@ numerical = ['URL_LENGTH',
              'APP_BYTES',
              'SOURCE_APP_PACKETS',
              'REMOTE_APP_PACKETS',
-             'SOURCE_APP_PACKETS',
-             'REMOTE_APP_PACKETS',
+             'SOURCE_APP_BYTES',
+             'REMOTE_APP_BYTES',
              'APP_PACKETS',
              'DNS_QUERY_TIMES']
 categorical = ['CHARSET',
@@ -39,16 +41,22 @@ df['Type'].value_counts()
 
 # Display numerical variable distributions.
 for i in numerical:
-    plt.hist(df[i])
+    ax=sns.histplot(df[i])
     plt.xlabel(i)
     plt.ylabel('FREQUENCY')
+    ax.grid(False)
+    plt.savefig('../output/eda_and_cleaning/images/hist_{}.jpg'.format(i), bbox_inches='tight')
     plt.show()
 
 # Display categorical variable distributions.
 for i in categorical:
-    plt.bar(df[i].value_counts().index,df[i].value_counts().values)
-    plt.xlabel(i)
-    plt.ylabel('FREQUENCY')
+    if i == 'SERVER' or i == 'WHOIS_COUNTRY' or i == 'WHOIS_STATEPRO':
+        plt.figure(figsize=(60, 60))
+    ax = sns.barplot(y=df[i].value_counts().index,x=df[i].value_counts().values, orient='h')
+    plt.ylabel(i)
+    ax.grid(False)
+    plt.xlabel('FREQUENCY')
+    plt.savefig('../output/eda_and_cleaning/images/bar_{}.jpg'.format(i), bbox_inches='tight')
     plt.show()
 
 # Display date column formats.    
@@ -235,16 +243,20 @@ times = ['REGISTER_HOUR',
 
 # Distribution of dates.
 for i in dates:
-    plt.hist(df[i])
+    ax = sns.histplot(df[i])
+    ax.grid(False)
     plt.xlabel(i)
     plt.ylabel('FREQUENCY')
+    plt.savefig('../output/eda_and_cleaning/images/hist_{}.jpg'.format(i), bbox_inches='tight')
     plt.show()  
 
 # Distribution of times.    
 for i in times:
-    plt.hist(df[i])
+    ax = sns.histplot(df[i])
+    ax.grid(False)
     plt.xlabel(i)
     plt.ylabel('FREQUENCY')
+    plt.savefig('../output/eda_and_cleaning/images/hist_{}.jpg'.format(i), bbox_inches='tight')
     plt.show()
 
 # Display unique in categorical variables.
@@ -447,5 +459,16 @@ for i in df['WHOIS_STATEPRO'].unique():
 for i in df.columns:
     print(i, ':', 100*df[i].isna().sum()/len(df[i]))
     
+# Correlation heatmap using Pearson's coefficient.
+plt.figure(figsize=(15,15))
+ax = sns.heatmap(df[numerical + dates + times].corr(method='pearson'), annot=False,
+                 vmin = -1, vmax=1)
+plt.title(
+    'Pearson correlation coefficient heatmap',
+    fontdict={'fontsize':25}, pad=12)
+ax.grid(False)
+plt.savefig('../output/eda_and_cleaning/images/heatmap_pearson_corr.jpg', bbox_inches='tight')
+plt.show()
+
 # Export cleaned dataframe for imputation.    
-df.to_csv('../output/eda_and_cleaning/df_to_impute.csv', index=False)
+df.to_csv('../output/eda_and_cleaning/csv/df_to_impute.csv', index=False)

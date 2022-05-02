@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 
 
 # Load dataset.
-df = pd.read_csv('../output/eda/df_to_impute.csv')
+df = pd.read_csv('../output/eda/csv/df_to_impute.csv')
 
 # Display percent null values per column.    
 for i in df.columns:
