@@ -34,6 +34,22 @@ The models I chose were due to their potential to handle an imbalanced dataset. 
 <br/><br/>
 </div>
 
+<div align="center">
+<figure>
+<img src="output/modeling/model_comparison/catplot_model_F1.jpg"><br/>
+  <figcaption>Figure 4: F1 scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+</figure>
+<br/><br/>
+</div>
+
+<div align="center">
+<figure>
+<img src="output/modeling/model_comparison/catplot_model_ROC_AUC.jpg"><br/>
+  <figcaption>Figure 5: ROC AUC scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+</figure>
+<br/><br/>
+</div>
+
 ## Resources
 
 1. [Malicious and benign websites dataset](https://www.kaggle.com/datasets/xwolf12/malicious-and-benign-websites)
