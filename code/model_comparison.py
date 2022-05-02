@@ -15,9 +15,9 @@ grid = ['#e0e0e0']
 plt.rcParams["axes.spines.right"] = True
 plt.rcParams["axes.spines.top"] = True
 
-df_no_sampling = pd.read_csv('../output/modeling/no_sampling/df_scores.csv')
+df_no_sampling = pd.read_csv('../output/modeling/no_sampling/csv/df_scores.csv')
 df_upsampling = pd.read_csv('../output/modeling/upsampling/df_scores.csv')
-df_downsampling = pd.read_csv('../output/modeling/downsampling/df_scores.csv')
+df_downsampling = pd.read_csv('../output/modeling/downsampling/csv/df_scores.csv')
 
 df = pd.concat([df_no_sampling, df_upsampling, df_downsampling],
                axis=0).reset_index().drop('index', axis=1)

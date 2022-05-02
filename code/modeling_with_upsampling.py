@@ -25,7 +25,7 @@ from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB, BernoulliNB
 from xgboost import XGBClassifier
 from numpy import mean, std
-from sklearn.model_selection import GridSearchCV 
+import pickle
 from sklearn.metrics import (recall_score, accuracy_score, f1_score,
                              precision_score, confusion_matrix,
                              precision_recall_curve)
@@ -37,8 +37,8 @@ y_train_valid = pd.read_csv('../output/imputation/y_train.csv')
 X_test = pd.read_csv('../output/imputation/X_test.csv')
 y_test = pd.read_csv('../output/imputation/y_test.csv')
 
-
-
+# Function that computes cross-validation scores by first splitting the data
+# into training and validation data and then upsamples the training data.
 def upsampleCV(clf, X_train_valid, y_train_valid, cv, scoring):
 
     cv_scores = []
@@ -72,47 +72,43 @@ def upsampleCV(clf, X_train_valid, y_train_valid, cv, scoring):
             
     return cv_scores
 
-
-
+# LogisticRegression baseline.
 lr = LogisticRegression(max_iter = 2000)
 cv = upsampleCV(lr,X_train_valid,y_train_valid,cv=5, scoring='f1')
 print("LogisticRegression: {} +/- {}".format(mean(cv),std(cv)))
 
-# Class_weight is a form of downsampling to accomodate imbalanced dataset.
+# RandomForestClassifier baseline.
 rf = RandomForestClassifier(random_state = 1)
 cv = upsampleCV(rf,X_train_valid,y_train_valid,cv=5, scoring='f1')
 print("RandomForestClassifier: {} +/- {}".format(mean(cv),std(cv)))
 
-# Class_weight is a form of cost-sensitive training to accomodate imbalanced dataset.
+# SVC baseline.
 svc = SVC(probability = True)
 cv = upsampleCV(svc,X_train_valid,y_train_valid,cv=5, scoring='f1')
 print("SVC: {} +/- {}".format(mean(cv),std(cv)))
 
+# GaussianNB baseline.
 gnb = GaussianNB()
 cv = upsampleCV(gnb,X_train_valid,y_train_valid,cv=5, scoring='f1')
 print("GaussianNB: {} +/- {}".format(mean(cv),std(cv)))
 
+# BernoulliNB baseline.
 bnb = BernoulliNB()
 cv = upsampleCV(bnb,X_train_valid,y_train_valid,cv=5, scoring='f1')
 print("BernoulliNB: {} +/- {}".format(mean(cv),std(cv)))
 
+# LinearDiscriminantAnalysis baseline.
 lda = LinearDiscriminantAnalysis()
 cv = upsampleCV(lda,X_train_valid,y_train_valid,cv=5, scoring='f1')
 print("LinearDiscriminatAnalysis: {} +/- {}".format(mean(cv),std(cv)))
 
+# XGBClassifier baseline.
 xgbc = XGBClassifier(use_label_encoder = False, eval_metric='error')
 cv = upsampleCV(xgbc,X_train_valid,y_train_valid,cv=5, scoring='f1')
 print("XGBClassifier: {} +/- {}".format(mean(cv),std(cv)))
 
-
-
-
-
-
-
-
-
-
+# Function that does a gridsearch (similar to GridSearchCV), but upsamples
+# the minority class training set after splitting the validation set from it.
 def upsample_gridsearchCV(clf, X, y, cv, scoring, param_grid):
     
     parameters = list(param_grid.keys())
@@ -172,7 +168,9 @@ def clf_performance(best_parameters, mean_score, std_score, model_name):
     print(model_name)
     print('Best Score: {} +/- {}'.format(str(mean_score),str(std_score)))
     print('Best Parameters: ' + str(best_parameters))
-    
+
+# Function for fitting all training data with optimal parameters found with
+# downsample_gridsearchCV.    
 def fit_all_training_data(clf, best_parameters, X_train_valid=X_train_valid,
                           y_train_valid=y_train_valid):
 
@@ -180,72 +178,106 @@ def fit_all_training_data(clf, best_parameters, X_train_valid=X_train_valid,
     
     return best_clf
 
-
-
-lr = LogisticRegression()
-param_grid = {'max_iter' : [15000],
-              'C' : np.arange(.001,.015,.001)
+# upsample_gridsearchCV for LogisticRegression. 
+lr = LogisticRegression(max_iter=15000)
+param_grid = {
+              'C' : np.arange(1.5,2.6,0.1),
+              'class_weight': [{0: 1, 1: w} for w in np.arange(1,10)]
              }
 best_parameters, mean_score, std_score = upsample_gridsearchCV(
     lr,X_train_valid, y_train_valid, cv=5,
     scoring = 'f1', param_grid=param_grid)
 clf_performance(best_parameters, mean_score, std_score,'\nLogistic Regression')
 clf_lr = fit_all_training_data(lr,best_parameters)
+outfile = open('../output/modeling/upsampling/models/logisticregression_model.pkl', 'wb')
+pickle.dump(clf_lr,outfile)
+outfile.close()  
     
-
+# upsample_gridsearchCV for RandomForestClassifier. 
 rf = RandomForestClassifier(random_state = 1)
 param_grid =  {
-                'n_estimators': np.arange(8,20,2), 
+                'n_estimators': np.arange(1,10,2), 
                 'bootstrap': [True,False], #bagging (T) vs. pasting (F)
-                'max_depth': [10],
+                'max_depth': np.arange(1,20,2),
                 'max_features': ['auto','sqrt'],
-                'min_samples_leaf': np.arange(2,6,1),
-                'min_samples_split': np.arange(2,6,1)
+                'min_samples_leaf': [2],
+                'min_samples_split': np.arange(2,20,2),
+                'class_weight': [{0: 1, 1: w} for w in np.arange(1,10,2)]
               }
 best_parameters, mean_score, std_score = upsample_gridsearchCV(
     rf,X_train_valid, y_train_valid, cv=5,
     scoring = 'f1', param_grid=param_grid)
 clf_performance(best_parameters, mean_score, std_score,'\nRandomForestClassifier')
 clf_rf = fit_all_training_data(rf,best_parameters)
+outfile = open('../output/modeling/upsampling/models/randomforestclassifier_model.pkl', 'wb')
+pickle.dump(clf_rf,outfile)
+outfile.close()
 
-
+# upsample_gridsearchCV for SVC.
 svc = SVC(probability = True, random_state = 1)
 param_grid = {
               'kernel': ['linear', 'poly', 'sigmoid','rbf'],
               'gamma': [1, 1e-1, 1e-2, 1e-3, 1e-4],
-              'C': np.arange(40,70,5)
+              'C': np.arange(.5,1.5,.1),
+              'class_weight': [{0: 1, 1: w} for w in np.arange(1,10)]
              }
 best_parameters, mean_score, std_score = upsample_gridsearchCV(
     svc,X_train_valid, y_train_valid, cv=5,
     scoring = 'f1', param_grid=param_grid)
 clf_performance(best_parameters, mean_score, std_score,'\nSVC')
 clf_svc = fit_all_training_data(svc,best_parameters)
+outfile = open('../output/modeling/upsampling/models/svc_model.pkl', 'wb')
+pickle.dump(clf_svc,outfile)
+outfile.close()
 
+# upsample_gridsearchCV for GaussianNB.
 gnb = GaussianNB()
-param_grid = {'var_smoothing': np.logspace(0,-9, num=100)}
+param_grid = {
+              'var_smoothing': np.logspace(0,-9, num=100),
+              'priors': [[1-x,x] for x in np.arange(.1,.9,.1)]
+              }
 best_parameters, mean_score, std_score = upsample_gridsearchCV(
     gnb,X_train_valid, y_train_valid, cv=5,
     scoring = 'f1', param_grid=param_grid)
 clf_performance(best_parameters, mean_score, std_score,'\nGaussianNB')
 clf_gnb = fit_all_training_data(gnb,best_parameters)
+outfile = open('../output/modeling/upsampling/models/gaussiannb_model.pkl', 'wb')
+pickle.dump(clf_gnb,outfile)
+outfile.close()  
 
+# upsample_gridsearchCV for LinearDiscriminantAnalysis.
 lda = LinearDiscriminantAnalysis()
-param_grid = {'solver': ['svd']}
+param_grid = {
+              'solver': ['svd'],
+              'priors': [[1-x,x] for x in np.arange(.1,.9,.1)]
+             }
 best_parameters, mean_score, std_score = upsample_gridsearchCV(
     lda,X_train_valid, y_train_valid, cv=5,
     scoring = 'f1', param_grid=param_grid)
 clf_performance(best_parameters, mean_score, std_score,'\nLinearDiscriminantAnalysis')
 clf_lda = fit_all_training_data(lda,best_parameters)
+outfile = open('../output/modeling/upsampling/models/lineardiscriminantanalysis_model.pkl', 'wb')
+pickle.dump(clf_lda,outfile)
+outfile.close()  
 
+# upsample_gridsearchCV for XGBClassifier.
 xgbc = XGBClassifier(eval_metric='error', verbosity=0)
-param_grid = {'learning_rate': [0.001], 'max_depth': np.arange(1,9),
-              'n_estimators': [100], 'scale_pos_weight': np.arange(5,10)}
+param_grid = {
+              'learning_rate': [0.001],
+              'max_depth': np.arange(1,20,2),
+              'n_estimators': [300],
+              'scale_pos_weight': np.arange(1,7,1)
+              }
 best_parameters, mean_score, std_score = upsample_gridsearchCV(
     xgbc,X_train_valid, y_train_valid, cv=5,
     scoring = 'f1', param_grid=param_grid)
 clf_performance(best_parameters, mean_score, std_score,'\nXGBClassifier')
 clf_xgbc = fit_all_training_data(xgbc,best_parameters)
+outfile = open('../output/modeling/upsampling/models/xgbclassifier_model.pkl', 'wb')
+pickle.dump(clf_xgbc,outfile)
+outfile.close()  
 
+# List of estimators and names.
 estimators = [clf_rf, clf_gnb, clf_lda, clf_lr, clf_svc, clf_xgbc]
 names = ['RandomForestClassifier',
          'GaussianNB',
@@ -254,6 +286,7 @@ names = ['RandomForestClassifier',
          'SVC',
          'XGBClassifier']
 
+# Function to compute metrics, ROC, and confusion matricies.
 def test_performance(estimators,clf_names,X_test=X_test,y_test=y_test):
     
     df_scores = pd.DataFrame()
@@ -288,7 +321,7 @@ def test_performance(estimators,clf_names,X_test=X_test,y_test=y_test):
         plt.xlabel('Predicted label')
         plt.ylabel('True label')
         plt.title('Confusion Matrix for {}'.format(clf_names[idx]))
-        plt.savefig('../output/modeling/upsampling/confusion_matrix_{}.jpg'.format(clf_names[idx]), bbox_inches='tight')
+        plt.savefig('../output/modeling/upsampling/images/confusion_matrix_{}.jpg'.format(clf_names[idx]), bbox_inches='tight')
         plt.show()
         
         # Plot ROC.
@@ -303,7 +336,7 @@ def test_performance(estimators,clf_names,X_test=X_test,y_test=y_test):
         plt.title('ROC for {}'.format(clf_names[idx]))
         plt.xlabel('False Positive Rate (1 - Specificity)')
         plt.ylabel('True Positive Rate (Sensitivity)')
-        plt.savefig('../output/modeling/upsampling/ROC_{}.jpg'.format(clf_names[idx]), bbox_inches='tight')
+        plt.savefig('../output/modeling/upsampling/images/ROC_{}.jpg'.format(clf_names[idx]), bbox_inches='tight')
         plt.show()
 
         # Calculate ROC AUC.
@@ -316,16 +349,18 @@ def test_performance(estimators,clf_names,X_test=X_test,y_test=y_test):
         plt.xlabel('Recall')
         plt.ylabel('Precision')
         plt.legend()
-        plt.savefig('../output/modeling/upsampling/PR_curve_{}.jpg'.format(clf_names[idx]), bbox_inches='tight')
+        plt.savefig('../output/modeling/upsampling/images/PR_curve_{}.jpg'.format(clf_names[idx]), bbox_inches='tight')
         plt.show()
 
         # Calculate precision-recall AUC.
         PR_AUC = metrics.auc(recall, precision)
         print('Precision-Recall AUC for {}: {}\n'.format(clf_names[idx], PR_AUC))
         
+        # Create a list of all scores.
         clf_scores = ['Upsampling', clf_names[idx], test_recall,
                       test_precision, test_f1, test_accuracy, ROC_AUC, PR_AUC]
         
+        # Create a dataframe with scores for later analysis.
         if len(df_scores) == 0:
             
             df_scores = pd.DataFrame([clf_scores], columns = ['Sampling',
@@ -341,7 +376,9 @@ def test_performance(estimators,clf_names,X_test=X_test,y_test=y_test):
             df_scores.loc[len(df_scores)] = clf_scores
         
     return df_scores
-    
+ 
+# Compute metrics with test set for all models with best parameters.   
 df_scores = test_performance(estimators,names)
 
-df_scores.to_csv('../output/modeling/upsampling/df_scores.csv', index=False)
+# Output csv file for all models and metrics.
+df_scores.to_csv('../output/modeling/upsampling/csv/df_scores.csv', index=False)
