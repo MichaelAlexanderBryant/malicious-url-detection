@@ -217,9 +217,9 @@ outfile.close()
 svc = SVC(probability = True, random_state = 1)
 param_grid = {
               'kernel': ['linear', 'poly', 'sigmoid','rbf'],
-              'gamma': [1, 1e-1, 1e-2, 1e-3, 1e-4],
+              'gamma': [1, 1e-2, 1e-4],
               'C': np.arange(.5,1.5,.1),
-              'class_weight': [{0: 1, 1: w} for w in np.arange(1,10)]
+              'class_weight': [{0: 1, 1: w} for w in np.arange(1,10,2)]
              }
 best_parameters, mean_score, std_score = upsample_gridsearchCV(
     svc,X_train_valid, y_train_valid, cv=5,
