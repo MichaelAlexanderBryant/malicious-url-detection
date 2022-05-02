@@ -44,7 +44,7 @@ The models I chose were due to their potential to handle an imbalanced dataset. 
 
 <div align="center">
 <figure>
-<img src="output/modeling/model_comparison/catplot_model_ROC_AUC.jpg"><br/>
+<img src="output/modeling/model_comparison/catplot_model_ROC AUC.jpg"><br/>
   <figcaption>Figure 5: ROC AUC scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
