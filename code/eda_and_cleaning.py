@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import re
+import itertools
 sns.set_theme(style="whitegrid")
 
 # Load dataset.
@@ -460,15 +461,15 @@ for i in df.columns:
     print(i, ':', 100*df[i].isna().sum()/len(df[i]))
     
 # Correlation heatmap using Pearson's coefficient.
-plt.figure(figsize=(15,15))
-ax = sns.heatmap(df[numerical + dates + times].corr(method='pearson'), annot=False,
+plt.figure(figsize=(10,10))
+ax = sns.heatmap(df[numerical].corr(method='pearson'), annot=False,
                  vmin = -1, vmax=1)
 plt.title(
     'Pearson correlation coefficient heatmap',
-    fontdict={'fontsize':25}, pad=12)
+    fontdict={'fontsize':15}, pad=12)
 ax.grid(False)
 plt.savefig('../output/eda_and_cleaning/images/heatmap_pearson_corr.jpg', bbox_inches='tight')
 plt.show()
-
+            
 # Export cleaned dataframe for imputation.    
 df.to_csv('../output/eda_and_cleaning/csv/df_to_impute.csv', index=False)
