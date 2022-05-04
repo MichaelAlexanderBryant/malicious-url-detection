@@ -66,8 +66,15 @@ The best flexible model was the upsampled SVC and best non-flexible model was th
 
 | Model              | Recall      | Precision   | F1          | Accuracy    | ROC AUC     |
 |     -----------    | ----------- | ----------- | ----------- | ----------- | ----------- |
-| LogisticRegression | 0.789       | 0.848       | 0.818       | 0.957       | 0.959       |
-| SVC                | 0.775       | 0.948       | 0.853       | 0.968       | 0.967       |
+| LogisticRegression | 0.789       | 0.848       | 0.818       | 0.957       | 0.884       |
+| SVC                | 0.775       | 0.948       | 0.853       | 0.968       | 0.898      |
+
+To properly compare the models, I adjusted the probability threshold of SVC from 0.50 to 0.38 to match precision with the LogisticRegression model and evaluted the SVC model again. The result, shown in the table below, indicates that the two models are equivalent.
+
+| Model              | Recall      | Precision   | F1          | Accuracy    | ROC AUC     |
+|     -----------    | ----------- | ----------- | ----------- | ----------- | ----------- |
+| LogisticRegression | 0.789       | 0.848       | 0.818       | 0.957       | 0.884       |
+| SVC                | 0.789       | 0.848       | 0.818       | 0.957       | 0.884       |
 
 
 ## Resources
