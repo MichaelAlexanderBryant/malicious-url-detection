@@ -63,11 +63,12 @@ The models were evaluated using several metrics. Accuracy is not a good metric d
 </div>
 
 The best flexible model was the upsampled SVC and best non-flexible model was the upsampled LogisticRegression. Their metrics are shown in the table below.
+
 <center>
-| Model              | Recall | Precision | F1 | Accuracy | ROC AUC |
-| -----------        | ----------- | -----------        | -----------        | -----------        | -----------        |
-| LogisticRegression | 0.789       | 0.848 | 0.818 | 0.957 | 0.959 |
-| SVC                | 0.775       | 0.948 | 0.853 | 0.968 | 0.967 |
+| Model              | Recall      | Precision   | F1          | Accuracy    | ROC AUC     |
+|     -----------    | ----------- | ----------- | ----------- | ----------- | ----------- |
+| LogisticRegression | 0.789       | 0.848       | 0.818       | 0.957       | 0.959       |
+| SVC                | 0.775       | 0.948       | 0.853       | 0.968       | 0.967       |
 </center>
 ## Resources
 
