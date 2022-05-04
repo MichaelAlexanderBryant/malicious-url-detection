@@ -20,7 +20,7 @@ I split the data using stratified sampling on the malicious/bengin categorical v
 
 ## Model Performance
 
-The modeling results are shown in Figures 1 through 5.
+The models were evaluated using several metrics. Accuracy is not a good metric due to the imbalanced dataset. Randomly guessing that every website is benign would yield an accuracy of 87.9%. Recall is important, because a false negative would result in the exposure to a malicious website. However, randomly guessing that every site is malicious would yield a perfect recall score, but an accuracy of 12.1% (it would also be very annoying to the user to have every website blocked). Therefore, a balance between precision and recall is needed. For this reason, F1 was chosen as the scoring metric. The model with their best parameters were evaluated with the test set and recall, precision, accuracy, F1, and ROC AUC were calculated. The results are shown in Figures 1 through 5.
 
 <div align="center">
 <figure>
