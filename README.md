@@ -16,6 +16,8 @@ The models I chose were due to their potential to handle an imbalanced dataset. 
 
 I chose models that might be effective against an imbalanced dataset. They have the ability to adjust prior probabilities, change class weights, or have a tunable cost parameter. In addition to having these qualities, I chose three non-flexible models (GaussianNB, LinearDiscriminantAnalysis, and LogisticRegression) and three flexible models (RandomForestClassifier, SVC, and XGBClassifier). I expected that the best performing model should come from the flexible model group and I would use that model's performance to compare the simpler models with. Should any of the simpler models have comparable performance then I would use that model due to easier interpretability.
 
+I also tried using sampling methods where I upsample the minority class (i.e., malicious websites) and downsample the majority class (i.e., benign websites). The results are shown in Figures 1 through 5.
+
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/catplot_model_Recall.jpg"><br/>
