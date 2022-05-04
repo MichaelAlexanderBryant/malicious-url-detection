@@ -8,7 +8,13 @@ Over 70% of all system intrusion breaches involve malware, and 32% of all malwar
 
 The models I chose were due to their potential to handle an imbalanced dataset. The dataset I used consisted of 12.1% malicious URLS and 87.9% benign. I chose models which have the ability to adjust prior probabilities, change class weights, or have a tunable cost parameter. I also tried downsampling and upsampling.
 
-## Results
+## Data Cleaning
+
+## Exploratory Data Analysis
+
+## Modeling Building
+
+I chose models that should be effective against an imbalanced dataset. They have the ability to adjust prior probabilities, change class weights, or have a tunable cost parameter. In addition to having these qualities, I chose three non-flexible models (GaussianNB, LinearDiscriminantAnalysis, and LogisticRegression) and three flexible models (RandomForestClassifier, SVC, and XGBClassifier). I expected that the best performing model should come from the flexible model group and I would use that model's performance to compare the simpler models with. Should any of the simpler models have comparable performance then I would use that model due to easier interpretability.
 
 <div align="center">
 <figure>
