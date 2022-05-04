@@ -12,11 +12,15 @@ The models I chose were due to their potential to handle an imbalanced dataset. 
 
 ## Exploratory Data Analysis
 
+## Feature Engineering
+
 ## Modeling Building
 
-I chose models that might be effective against an imbalanced dataset. They have the ability to adjust prior probabilities, change class weights, or have a tunable cost parameter. In addition to having these qualities, I chose three non-flexible models (GaussianNB, LinearDiscriminantAnalysis, and LogisticRegression) and three flexible models (RandomForestClassifier, SVC, and XGBClassifier). I expected that the best performing model should come from the flexible model group and I would use that model's performance to compare the simpler models with. Should any of the simpler models have comparable performance then I would use that model due to easier interpretability.
+I split the data using stratified sampling on the malicious/bengin categorical variable (i.e., Type) with the training set getting 2/3 of the data and test set getting 1/3. I chose models that might be effective against the imbalanced dataset. They have the ability to adjust prior probabilities, change class weights, or have a tunable cost parameter. In addition to having these qualities, I chose three non-flexible models (GaussianNB, LinearDiscriminantAnalysis, and LogisticRegression) and three flexible models (RandomForestClassifier, SVC, and XGBClassifier). I expected that the best performing model should come from the flexible model group and I would use that model's performance to compare the simpler models with. Should any of the simpler models have comparable performance then I could use that model to explore variable importance due to easier interpretability. To evaluate the models I used five-fold cross validation. I tried three different tactics for training the models: upsampling, downsampling, and no sampling. For upsampling and downsampling, for each of the five folds I split the data into the training set and validation set then either upsampled or downsampled the training set. I upsampled the minority class (i.e., malicious website) or downsampled the majority class (i.e., benign website). These three different scenarios (upsampling, downsampling, and no sampling) were performed in three different py scripts. These sampling methods were deployed to help counteract the imbalanced dataset.
 
-I also tried using sampling methods where I upsample the minority class (i.e., malicious websites) and downsample the majority class (i.e., benign websites). The results are shown in Figures 1 through 5.
+## Model Performance
+
+The modeling results are shown in Figures 1 through 5.
 
 <div align="center">
 <figure>
