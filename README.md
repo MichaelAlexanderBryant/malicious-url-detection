@@ -8,11 +8,39 @@ Over 70% of all system intrusion breaches involve malware, and 32% of all malwar
 
 The models I chose were due to their potential to handle an imbalanced dataset. The dataset I used consisted of 12.1% malicious URLS and 87.9% benign. I chose models which have the ability to adjust prior probabilities, change class weights, or have a tunable cost parameter. I also tried downsampling and upsampling while tuning the parameters with cross-validation.
 
-## Data Cleaning
+## Exploratory Data Analysis, Data Cleaning, and Feature Engineering
 
-## Exploratory Data Analysis
+During my exploratory data analysis, I cleaned and feature engineered the data in the following ways:
+* Set values of "b", "0", and "None" in the date columns `WHOIS_REGDATE` and `WHOIS_UPDATED_DATE` to NaN
+* Parsed date columns which contained different date formats
+* Created new time feature by seperating time from date
+* Created five new date features using datetime to extract day of year, day of month, day of week, weekend, and working day
+* Seperated `SERVER` column into a binary matrix for each type of server
+* Removed server versions and non-server entries  
+* Set "None" and "\[U'GB'; U'UK']" in `WHOIS_COUNTRY` column to NaN and "UK", respectively
+* Standardized `WHOIS_COUNTRY` column to country abbreviations from mix of country abbreviations and full names using a dictionary
+* Set "None", "P", "Not Applicable", random symbols, countries, email, and "Other" in `WHOIS_STATE` to NaN 
+* Standardized `WHOSIS_STATE` column to state abbreviations from mix of state abbreviations, full names, and zip codes using a dictionary
 
-## Feature Engineering
+Figures 1 and 2 are some of the highlights from my exploratory data analysis.
+
+<div align="center">
+<figure>
+<img src="output/eda_and_cleaning/images/bar_Type.jpg"><br/>
+  <figcaption>Figure 1: Distribution of malicious and benign websites.</figcaption>
+</figure>
+<br/><br/>
+</div>
+
+<div align="center">
+<figure>
+<img src="output/eda_and_cleaning/images/heatmap_pearson_corr.jpg"><br/>
+  <figcaption>Figure 2: Pearson correlation coefficient heatmap for numerical variables.</figcaption>
+</figure>
+<br/><br/>
+</div>
+
+## Data Imputation
 
 ## Modeling Building
 
@@ -20,12 +48,12 @@ I split the data using stratified sampling on the malicious/bengin categorical v
 
 ## Model Performance
 
-The models were evaluated using several metrics. Accuracy is not a good metric due to the imbalanced dataset. Randomly guessing that every website is benign would yield an accuracy of 87.9%. Recall is important, because a false negative would result in the exposure to a malicious website. However, randomly guessing that every site is malicious would yield a perfect recall score, but an accuracy of 12.1% (it would also be very annoying to the user to have every website blocked). Therefore, a balance between precision and recall is needed. For this reason, F1 was chosen as the scoring metric. The models (with their best parameters) were evaluated with the test set and recall, precision, accuracy, F1, and ROC AUC were calculated. The results are shown in Figures 1 through 5.
+The models were evaluated using several metrics. Accuracy is not a good metric due to the imbalanced dataset. Randomly guessing that every website is benign would yield an accuracy of 87.9%. Recall is important, because a false negative would result in the exposure to a malicious website. However, randomly guessing that every site is malicious would yield a perfect recall score, but an accuracy of 12.1% (it would also be very annoying to the user to have every website blocked). Therefore, a balance between precision and recall is needed. For this reason, F1 was chosen as the scoring metric. The models (with their best parameters) were evaluated with the test set and recall, precision, accuracy, F1, and ROC AUC were calculated. The results are shown in Figures 3 through 7.
 
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/catplot_model_Recall.jpg"><br/>
-  <figcaption>Figure 1: Recall scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 3: Recall scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
@@ -33,7 +61,7 @@ The models were evaluated using several metrics. Accuracy is not a good metric d
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/catplot_model_Precision.jpg"><br/>
-  <figcaption>Figure 2: Precision scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 4: Precision scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
@@ -41,7 +69,7 @@ The models were evaluated using several metrics. Accuracy is not a good metric d
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/catplot_model_Accuracy.jpg"><br/>
-  <figcaption>Figure 3: Accuracy scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 5: Accuracy scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
@@ -49,7 +77,7 @@ The models were evaluated using several metrics. Accuracy is not a good metric d
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/catplot_model_F1.jpg"><br/>
-  <figcaption>Figure 4: F1 scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 6: F1 scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
@@ -57,7 +85,7 @@ The models were evaluated using several metrics. Accuracy is not a good metric d
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/catplot_model_ROC AUC.jpg"><br/>
-  <figcaption>Figure 5: ROC AUC scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 7: ROC AUC scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
