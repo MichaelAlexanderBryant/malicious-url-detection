@@ -109,6 +109,14 @@ The models were evaluated using several metrics, but primarily with F1. Accuracy
 <br/><br/>
 </div>
 
+<div align="center">
+<figure>
+<img src="output/modeling/model_comparison/catplot_model_PR AUC.jpg"><br/>
+  <figcaption>Figure 10: PR AUC scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+</figure>
+<br/><br/>
+</div>
+
 Using F1 scores, the best flexible model was the upsampled SVC and best non-flexible model was the upsampled LogisticRegression. Their metrics are shown in the table below.
 
 | Model              | Recall      | Precision   | F1          | Accuracy    | ROC AUC     |
