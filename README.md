@@ -23,7 +23,7 @@ During my exploratory data analysis, I cleaned and feature engineered the data i
 * Set "None", "P", "Not Applicable", random symbols, countries, email, and "Other" in `WHOIS_STATE` to NaN 
 * Standardized `WHOSIS_STATE` column to state abbreviations from mix of state abbreviations, full names, and zip codes using a dictionary
 
-Figures 1 and 2 are some of the highlights from my exploratory data analysis.
+Figures 1 through 4 are some of the highlights from my exploratory data analysis.
 
 <div align="center">
 <figure>
