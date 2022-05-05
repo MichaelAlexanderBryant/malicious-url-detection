@@ -41,6 +41,22 @@ Figures 1 and 2 are some of the highlights from my exploratory data analysis.
 <br/><br/>
 </div>
 
+<div align="center">
+<figure>
+<img src="output/eda_and_cleaning/images/hist_URL_LENGTH.jpg"><br/>
+  <figcaption>Figure 3: Distribution of URL length.</figcaption>
+</figure>
+<br/><br/>
+</div>
+
+<div align="center">
+<figure>
+<img src="output/eda_and_cleaning/images/hist_NUMBERSPECIAL_CHARACTERS.jpg"><br/>
+  <figcaption>Figure 4: Distribution of number of special characters used in URL.</figcaption>
+</figure>
+<br/><br/>
+</div>
+
 ## Data Imputation
 
 ## Modeling Building
@@ -49,12 +65,12 @@ I split the data using stratified sampling on the malicious/bengin categorical v
 
 ## Model Performance
 
-The models were evaluated using several metrics. Accuracy is not a good metric due to the imbalanced dataset. Randomly guessing that every website is benign would yield an accuracy of 87.9%. Recall is important, because a false negative would result in the exposure to a malicious website. However, randomly guessing that every site is malicious would yield a perfect recall score, but an accuracy of 12.1% (it would also be very annoying to the user to have every website blocked). Therefore, a balance between precision and recall is needed. For this reason, F1 was chosen as the scoring metric. The models (with their best parameters) were evaluated with the test set and recall, precision, accuracy, F1, and ROC AUC were calculated. The results are shown in Figures 3 through 7.
+The models were evaluated using several metrics. Accuracy is not a good metric due to the imbalanced dataset. Randomly guessing that every website is benign would yield an accuracy of 87.9%. Recall is important, because a false negative would result in the exposure to a malicious website. However, randomly guessing that every site is malicious would yield a perfect recall score, but an accuracy of 12.1% (it would also be very annoying to the user to have every website blocked). Therefore, a balance between precision and recall is needed. For this reason, F1 was chosen as the scoring metric. The models (with their best parameters) were evaluated with the test set and recall, precision, accuracy, F1, and ROC AUC were calculated. The results are shown in Figures 5 through 9.
 
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/catplot_model_Recall.jpg"><br/>
-  <figcaption>Figure 3: Recall scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 5: Recall scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
@@ -62,7 +78,7 @@ The models were evaluated using several metrics. Accuracy is not a good metric d
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/catplot_model_Precision.jpg"><br/>
-  <figcaption>Figure 4: Precision scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 6: Precision scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
@@ -70,7 +86,7 @@ The models were evaluated using several metrics. Accuracy is not a good metric d
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/catplot_model_Accuracy.jpg"><br/>
-  <figcaption>Figure 5: Accuracy scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 7: Accuracy scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
@@ -78,7 +94,7 @@ The models were evaluated using several metrics. Accuracy is not a good metric d
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/catplot_model_F1.jpg"><br/>
-  <figcaption>Figure 6: F1 scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 8: F1 scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
@@ -86,7 +102,7 @@ The models were evaluated using several metrics. Accuracy is not a good metric d
 <div align="center">
 <figure>
 <img src="output/modeling/model_comparison/catplot_model_ROC AUC.jpg"><br/>
-  <figcaption>Figure 7: ROC AUC scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
+  <figcaption>Figure 9: ROC AUC scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
 </div>
