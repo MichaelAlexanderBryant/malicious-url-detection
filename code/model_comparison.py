@@ -6,15 +6,7 @@ import pickle
 from sklearn.metrics import recall_score, precision_score, accuracy_score, f1_score, roc_auc_score, roc_curve
 sns.set_theme(style="whitegrid")
 
-#plot colors: [grey, blue, orange, green, pink, brown, purple, yellow, red]
-light = ['#8c8c8c', '#88bde6', '#fbb258', '#90cd97', '#f6aac8', '#bfa454', '#bc99c7', '#eddd46', '#f07d6e']
-medium = ['#4d4d4d', '#5da6da', '#faa43a', '#60bd68', '#f17cb1', '#b2912f', '#b276b2', '#dece3f', '#f15954']
-dark_bright = ['#000000', '#265dab', '#df5c24', '#059749', '#e5126d', '#9d732a', '#7a3a96', '#c7b52e', '#cb2026']
-
-#grid/rule lines: light grey
-grid = ['#e0e0e0']
-
-#plot parameters
+# Plot parameters
 plt.rcParams["axes.spines.right"] = True
 plt.rcParams["axes.spines.top"] = True
 
