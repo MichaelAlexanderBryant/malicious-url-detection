@@ -51,7 +51,7 @@ Figures 1 through 4 are some of the highlights from my exploratory data analysis
 
 <div align="center">
 <figure>
-<img src="output/eda_and_cleaning/images/hist_NUMBERSPECIAL_CHARACTERS.jpg"><br/>
+<img src="output/eda_and_cleaning/images/hist_NUMBER_SPECIAL_CHARACTERS.jpg"><br/>
   <figcaption>Figure 4: Distribution of number of special characters used in URL.</figcaption>
 </figure>
 <br/><br/>
