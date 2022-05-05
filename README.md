@@ -27,7 +27,7 @@ Figures 1 and 2 are some of the highlights from my exploratory data analysis.
 <div align="center">
 <figure>
 <img src="output/eda_and_cleaning/images/bar_Type.jpg"><br/>
-  <figcaption>Figure 1: Distribution of malicious and benign websites.</figcaption>
+  <figcaption>Figure 1: Distribution of malicious (1) and benign (0) websites.</figcaption>
 </figure>
 <br/><br/>
 </div>
