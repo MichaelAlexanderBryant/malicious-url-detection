@@ -63,7 +63,7 @@ plt.rcParams['font.size'] = 12
 plt.title('ROC')
 plt.xlabel('False Positive Rate (1 - Specificity)')
 plt.ylabel('True Positive Rate (Sensitivity)')
-plt.savefig('../output/modeling/model_comparison/images/ROC_logisticregression_svc.jpg', bbox_inches='tight')
+plt.savefig('../output/modeling/model_comparison/ROC_logisticregression_svc.jpg', bbox_inches='tight')
 plt.show()
 
 
