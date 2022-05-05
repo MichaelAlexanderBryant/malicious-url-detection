@@ -111,7 +111,7 @@ The models were evaluated using several metrics, but primarily with F1. Accuracy
 
 <div align="center">
 <figure>
-<img src="output/modeling/model_comparison/catplot_model_PR AUC.jpg"><br/>
+<img src="output/modeling/model_comparison/catplot_model_Precision-Recall AUC.jpg"><br/>
   <figcaption>Figure 10: PR AUC scores per model using non-sampled, downsampled, and upsampled training data.</figcaption>
 </figure>
 <br/><br/>
