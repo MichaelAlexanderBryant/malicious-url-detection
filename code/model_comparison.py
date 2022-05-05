@@ -1,6 +1,9 @@
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pickle
+from sklearn.metrics import recall_score, precision_score, accuracy_score, f1_score, roc_auc_score, roc_curve
 sns.set_theme(style="whitegrid")
 
 #plot colors: [grey, blue, orange, green, pink, brown, purple, yellow, red]
@@ -22,34 +25,47 @@ df_downsampling = pd.read_csv('../output/modeling/downsampling/csv/df_scores.csv
 df = pd.concat([df_no_sampling, df_upsampling, df_downsampling],
                axis=0).reset_index().drop('index', axis=1)
 
-
+# Plot side-by-side barplots to compare models, metrics, and sampling methods.
 for idx, val in enumerate(df.columns[2:]):
-    sorted_index_descent = df.groupby(['Model']).max().sort_values(by= val,ascending=False).index
     
     df = df.sort_values(by=['Model', 'Sampling',val], ascending=True)
     
     plt.figure(figsize=(10, 10))
-    #ax = sns.scatterplot(data = df, y = 'Model', x = val, hue = 'Sampling', style='Sampling', s=225, linewidth=0, alpha=0.75, markers=('o','s','^'), palette=[medium[1],medium[8],medium[3]])
-    #ax = sns.stripplot(y = df['Model'], x = df[val], hue = df['Sampling'], s=15, jitter=False, order=sorted_index_descent, alpha=0.75, palette=[medium[1],medium[8],medium[3]])
-    ax = sns.catplot(data = df, y = 'Model', x = val, hue = 'Sampling', kind='bar')
+    ax = sns.catplot(data = df, y = 'Model', x = val, hue = 'Sampling', kind='bar', legend=False)
     ax.set(xlim=(0,1))
     ax.set(ylabel=None)
-    # ax.set_ylabel('')
-    # ax.set_xlabel(val)
-    # ax.set_xlim([-.1,1.1])
-    # ax.spines["bottom"].set_color(dark_bright[0])
-    # ax.spines["left"].set_color(dark_bright[0])
-    # ax.spines["top"].set_color(dark_bright[0])
-    # ax.spines["right"].set_color(dark_bright[0])
-    # ax.xaxis.label.set_color(dark_bright[0])
-    # ax.yaxis.label.set_color(dark_bright[0])
-    # ax.title.set_color(dark_bright[0])
-    # ax.tick_params(axis='x', colors = light[0], labelcolor=dark_bright[0])
-    # ax.tick_params(axis='y', colors = light[0], labelcolor=dark_bright[0])
-    # ax.yaxis.set_ticks_position('none')
-    # ax.grid(color = 'w', axis='x')
-    # ax.grid(color = grid[0], axis='y')
-    # ax.legend(loc="upper left")    
-    # ax.set_axisbelow(True)
+    plt.gca().legend().set_title('')
+    plt.legend(bbox_to_anchor=(1.025, .55), loc=2, borderaxespad=0.)
     plt.savefig('../output/modeling/model_comparison/catplot_model_{}.jpg'.format(val), bbox_inches='tight')
     plt.show()
+
+# Load LogisticRegression and SVC models with best parameters.    
+svc = pickle.load(open('../output/modeling/upsampling/models/svc_model.pkl', 'rb'))
+lr = pickle.load(open('../output/modeling/upsampling/models/logisticregression_model.pkl', 'rb'))
+X_test = pd.read_csv('../output/imputation/X_test.csv')
+y_test = pd.read_csv('../output/imputation/y_test.csv')
+
+
+# Plot ROC.
+pred_prob_lr = lr.predict_proba(X_test) 
+pred_prob_svc = svc.predict_proba(X_test) 
+fpr_lr, tpr_lr, thresholds_lr = roc_curve(y_test, pred_prob_lr[:,1])
+fpr_svc, tpr_svc, thresholds_svc = roc_curve(y_test, pred_prob_svc[:,1])
+fig, ax = plt.subplots(figsize=(10, 10))
+ax.plot(fpr_lr, tpr_lr, label='LogisticRegression')
+ax.plot(fpr_svc, tpr_svc, label='SVC')
+ax.plot([0, 1], [0, 1], transform=ax.transAxes, ls="--", c=".3")
+ax.legend()
+ax.grid(False)
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.0])
+plt.rcParams['font.size'] = 12
+plt.title('ROC')
+plt.xlabel('False Positive Rate (1 - Specificity)')
+plt.ylabel('True Positive Rate (Sensitivity)')
+plt.savefig('../output/modeling/model_comparison/images/ROC_logisticregression_svc.jpg', bbox_inches='tight')
+plt.show()
+
+
+
+
