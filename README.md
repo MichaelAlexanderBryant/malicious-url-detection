@@ -11,6 +11,7 @@ The models I chose were due to their potential to handle an imbalanced dataset. 
 ## Exploratory Data Analysis, Data Cleaning, and Feature Engineering
 
 During my exploratory data analysis, I cleaned and feature engineered the data in the following ways:
+* Fixed `CHARSET` to be uniformly uppercase and set "None" to NaN
 * Set values of "b", "0", and "None" in the date columns `WHOIS_REGDATE` and `WHOIS_UPDATED_DATE` to NaN
 * Parsed date columns which contained different date formats
 * Created new time feature by seperating time from date
