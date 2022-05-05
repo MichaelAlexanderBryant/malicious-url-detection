@@ -124,7 +124,15 @@ Using F1 scores, the best flexible model was the upsampled SVC and best non-flex
 | LogisticRegression | 0.789       | 0.848       | 0.818       | 0.957       | 0.882       | 0.882       |
 | SVC                | 0.775       | 0.948       | 0.853       | 0.968       | 0.898       | 0.898       |
 
+Below is the ROC AUC plot to compare the LogisticRegression and SVC models.
 
+<div align="center">
+<figure>
+<img src="output/modeling/model_comparison/ROC_logisticregression_svc.jpg"><br/>
+  <figcaption>Figure 10: ROC for LogisticRegression and SVC.</figcaption>
+</figure>
+<br/><br/>
+</div>
 
 ## Resources
 
