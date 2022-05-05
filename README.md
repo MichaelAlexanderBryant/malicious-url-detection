@@ -16,7 +16,7 @@ During my exploratory data analysis, I cleaned and feature engineered the data i
 * Parsed date columns which contained different date formats
 * Created new time feature by seperating time from date
 * Created five new date features using datetime to extract day of year, day of month, day of week, weekend, and working day
-* Seperated `SERVER` column into a binary matrix for each type of server
+* Seperated `SERVER` column into a binary matrix for each type of server using regular expressions
 * Removed server versions and non-server entries  
 * Set "None" and "\[U'GB'; U'UK']" in `WHOIS_COUNTRY` column to NaN and "UK", respectively
 * Standardized `WHOIS_COUNTRY` column to country abbreviations from mix of country abbreviations and full names using a dictionary
