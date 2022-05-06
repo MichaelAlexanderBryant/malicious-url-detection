@@ -134,6 +134,10 @@ Below is the ROC AUC plot to compare the LogisticRegression and SVC models.
 <br/><br/>
 </div>
 
+## Future Work
+
+I am currently building an anomoly detection system using this dataset. The py file is code/anomaly_detection_system.py.
+
 ## Resources
 
 1. [Malicious and benign websites dataset](https://www.kaggle.com/datasets/xwolf12/malicious-and-benign-websites)
